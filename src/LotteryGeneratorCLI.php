@@ -22,7 +22,7 @@ use ZF\Console\Route;
 class LotteryGeneratorCLI
 {
     /**
-     * Generate Lotto numbers.
+     * Generate Lotto numbers and output.
      *
      * @since 1.0.0
      *
@@ -33,6 +33,10 @@ class LotteryGeneratorCLI
     {
         $generator = new GenerateLotto();
         $result = $generator::generate();
-        $console->writeLine(implode(',', $result));
+        $ctr = 0;
+        foreach ($result as $line) {
+            $ctr++;
+            $console->writeLine('Line ' . $ctr . ': ' . implode(', ', $line));
+        }
     }
 }
