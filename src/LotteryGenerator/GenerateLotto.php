@@ -9,8 +9,6 @@
 
 namespace MarkHeydon\LotteryGenerator;
 
-use Zend\Console\Adapter\AdapterInterface as Console;
-
 class GenerateLotto
 {
     /**
