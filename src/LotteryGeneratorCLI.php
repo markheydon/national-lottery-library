@@ -25,6 +25,7 @@ class LotteryGeneratorCLI
      * Generate Lotto numbers and output.
      *
      * @since 1.0.0
+     * @codeCoverageIgnore
      *
      * @param Route $route The ZF\Console\Route instance from the Dispatcher.
      * @param Console $console The Zend\Console adapter currently in use.

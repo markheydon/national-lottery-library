@@ -194,9 +194,6 @@ class GenerateLotto
                 }
             }
         }
-        if (count($ballCount) < 1) {
-            return 0;
-        }
         arsort($ballCount);
         reset($ballCount);
         return (int)key($ballCount) ?? 0;
@@ -284,10 +281,6 @@ class GenerateLotto
      */
     private static function csvToArray($filename = '', $delimiter = ','): array
     {
-        if (!file_exists($filename) || !is_readable($filename)) {
-            return false;
-        }
-
         $header = null;
         $data = [];
         if (($handle = fopen($filename, 'r')) !== false) {
