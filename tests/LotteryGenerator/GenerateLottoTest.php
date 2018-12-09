@@ -38,4 +38,19 @@ class GenerateLottoTest extends TestCase
             $this->assertCount(6, $line);
         }
     }
+
+    /**
+     * Tests to make sure there are no duplicates in the lines generated.
+     *
+     * @since 1.0.0
+     */
+    public function testGenerateResultsDontOverlap()
+    {
+        $var = GenerateLotto::generate();
+        foreach ($var as $line) {
+            $unique = array_unique($line);
+            $this->assertSame($line, $unique);
+        }
+
+    }
 }
