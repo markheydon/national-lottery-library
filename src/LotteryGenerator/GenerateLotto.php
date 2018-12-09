@@ -12,54 +12,39 @@ namespace MarkHeydon\LotteryGenerator;
 class GenerateLotto
 {
     /**
-     * Generate Lotto numbers.
+     * Generate 'random' Lotto numbers.
+     *
+     * @since 1.0.0
      *
      * @return array Array of lines containing generated numbers.
      */
-    public static function generate()
+    public static function generate(): array
     {
-        $lines = [];
-
         // @todo: Download results periodically -- only updated weekly I think?
         // Currently using a lotto-draw-history.csv file but should download and/or utilize a database.
         $allDraws = self::readLottoDrawHistory();
 
-        // Generate lines using most frequent machine first
-        $freqMachines = self::calculateMachinesFrequency($allDraws);
-        foreach ($freqMachines as $freqMachine) {
-            $results = [];
-
-            // Look for most frequently used ball set (for single machine).
-            $filteredDraws = self::filterDrawsByMachine($allDraws, $freqMachine);
-            $freqBall = self::calculateFrequentBall($filteredDraws);
-            // Want 6 numbers in total
-            $results[] = $freqBall;
-            for ($n = 1; $n < 6; $n++) {
-                $filteredDraws = self::filterDrawsByBall($filteredDraws, $freqBall);
-                $freqBall = self::calculateFrequentBall($filteredDraws, $results);
-                $results[] = $freqBall;
-            }
-
-            // sort results and add to generated lines
-            asort($results);
-            $lines[] = $results;
-        }
-
+        // Build some generated lines of 'random' numbers and return
+        $lines = self::generateMethod2($allDraws);
+        $lines = array_merge($lines,self::generateMethod1($allDraws));
         return $lines;
     }
 
     /**
      * Filter the specified draws array by the specified ball number (value).
      *
+     * @since 1.0.0
+     *
      * @param array $draws Array of draws.
      * @param int $ball Ball value number to filter by.
      * @return array Filtered array of draws.
      */
-    private static function filterDrawsByBall(array $draws, int $ball)
+    private static function filterDrawsByBall(array $draws, int $ball): array
     {
         $filteredDraws = array_filter($draws, function ($draw) use ($ball) {
             $result = $draw['ball1'] == $ball || $draw['ball2'] == $ball || $draw['ball3'] == $ball ||
-                $draw['ball4'] == $ball || $draw['ball5'] == $ball || $draw['ball6'] == $ball;
+                $draw['ball4'] == $ball || $draw['ball5'] == $ball || $draw['ball6'] == $ball ||
+                $draw['bonusBall'] == $ball;
             return $result;
         });
         return $filteredDraws;
@@ -68,11 +53,13 @@ class GenerateLotto
     /**
      * Filter the specified array by the specified machine name.
      *
+     * @since 1.0.0
+     *
      * @param array $draws Array of draws.
      * @param string $machine Machine name to filter by.
      * @return array Filtered array of draws.
      */
-    private static function filterDrawsByMachine(array $draws, string $machine)
+    private static function filterDrawsByMachine(array $draws, string $machine): array
     {
         $filteredDraws = array_filter($draws, function ($draw) use ($machine) {
             return $draw['machine'] === $machine;
@@ -81,28 +68,98 @@ class GenerateLotto
     }
 
     /**
-     * Returns a list of machine names sorted by more frequent first.
+     * Filter the specified array by the specified ball set.
+     *
+     * @since 1.0.0
+     *
+     * @param array $draws Array of draws.
+     * @param string $ballSet Ball set to filter by.
+     * @return array Filtered array of draws.
+     */
+    private static function filterDrawsByBallSet(array $draws, string $ballSet): array
+    {
+        $filteredDraws = array_filter($draws, function ($draw) use ($ballSet) {
+            return $draw['ballSet'] === $ballSet;
+        });
+        return $filteredDraws;
+    }
+
+    /**
+     * Returns a list of machine names sorted by most frequent first.
+     *
+     * @since 1.0.0
      *
      * @param array $draws Array of draws.
      * @return array Array of machine names with most frequent first.
      */
-    private static function calculateMachinesFrequency(array $draws)
+    private static function getMachineNames(array $draws): array
     {
-        $machineCount = [];
-        foreach ($draws as $draw) {
-            $machine = $draw['machine'];
-            if (!isset($machineCount[$machine])) {
-                $machineCount[$machine] = 1;
-            } else {
-                $machineCount[$machine]++;
-            }
-        }
-        if (count($machineCount) < 1) {
-            return [];
-        }
+        $machineCount = self::getCount($draws, 'machine');
         arsort($machineCount);
         reset($machineCount);
         return array_keys($machineCount);
+    }
+
+    /**
+     * Returns a list of ball sets sorted by most frequent first.
+     *
+     * @since 1.0.0
+     *
+     * @param array $draws Array of draws.
+     * @return array Array of ball sets with most frequent first.
+     */
+    private static function getBallSets(array $draws): array
+    {
+        $ballSetCount = self::getCount($draws, 'ballSet');
+        arsort($ballSetCount);
+        reset($ballSetCount);
+        return array_keys($ballSetCount);
+    }
+
+    /**
+     * Returns an array of counters for the specified array element in the supplied draws array.
+     *
+     * @since 1.0.0
+     *
+     * @param array $draws Array of draws.
+     * @param string $element Element name within the draws array.
+     * @return array Array of elements with count of their occurrence in the draws array.
+     */
+    private static function getCount(array $draws, string $element): array
+    {
+        $count = [];
+        foreach ($draws as $draw) {
+            $machine = $draw[$element];
+            if (!isset($count[$machine])) {
+                $count[$machine] = 1;
+            } else {
+                $count[$machine]++;
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * Returns array of balls that frequently occur together for the specified draws array.
+     *
+     * @param array $draws The draws array to use.
+     * @return array Array of balls.
+     */
+    private static function getFrequentBalls(array $draws): array
+    {
+        // Want 6 numbers in total
+        $results = [];
+        $freqBall = self::calculateFrequentBall($draws);
+        $results[] = $freqBall;
+        for ($n = 1; $n < 6; $n++) {
+            $draws = self::filterDrawsByBall($draws, $freqBall);
+            $freqBall = self::calculateFrequentBall($draws, $results);
+            $results[] = $freqBall;
+        }
+
+        // Sort the results and return
+        asort($results);
+        return $results;
     }
 
     /**
@@ -111,16 +168,22 @@ class GenerateLotto
      * Looks through all the draws and counts the number of times a ball value occurs
      * and return the highest count value.  Optionally excludes the specified ball values.
      *
+     * @since 1.0.0
+     *
      * @param array $draws The draws array.
      * @param array $except Optional array of ball values to ignore from the count.
      * @return int Ball value of the most frequently occurring or 0 if draws array is empty.
      */
-    private static function calculateFrequentBall(array $draws, array $except = [])
+    private static function calculateFrequentBall(array $draws, array $except = []): int
     {
         $ballCount = [];
         foreach ($draws as $draw) {
-            for ($b = 1; $b <= 6; $b++) {
-                $ballNumber = 'ball' . $b;
+            for ($b = 1; $b <= 7; $b++) {
+                if ($b === 7) {
+                    $ballNumber = 'bonusBall';
+                } else {
+                    $ballNumber = 'ball' . $b;
+                }
                 $ballValue = $draw[$ballNumber];
                 if (!in_array($ballValue, $except)) {
                     if (!isset($ballCount[$ballValue])) {
@@ -144,10 +207,12 @@ class GenerateLotto
      *
      * CSV history file seems to be in the format 'RAF;RAF,RAF,RAF'.
      *
+     * @since 1.0.0
+     *
      * @param string $raffles String from CSV history file for field 'Raffles'.
      * @return array Array of strings of all the raffles numbers from the specified string.
      */
-    private static function parseRafflesString(string $raffles)
+    private static function parseRafflesString(string $raffles): array
     {
         if (empty($raffles)) {
             return [];
@@ -162,9 +227,11 @@ class GenerateLotto
     /**
      * Uses the lotto-draw-history.csv file in the data directory to return a draws array.
      *
+     * @since 1.0.0
+     *
      * @return array The draws array.
      */
-    private static function readLottoDrawHistory()
+    private static function readLottoDrawHistory(): array
     {
         $filename = 'lotto-draw-history.csv';
         $filepath = __DIR__ . '/../../data/' . $filename;
@@ -184,10 +251,12 @@ class GenerateLotto
             $machine = $draw['Machine'];
             $raffles = self::parseRafflesString($draw['Raffles']);
             $drawNumber = $draw['DrawNumber'];
+            $dayOfDraw = date('l', strtotime($drawDate));
 
             $allDraws[] = [
                 'drawNumber' => $drawNumber,
                 'drawDate' => $drawDate,
+                'drawDay' => $dayOfDraw,
                 'ball1' => $ball1,
                 'ball2' => $ball2,
                 'ball3' => $ball3,
@@ -207,11 +276,13 @@ class GenerateLotto
     /**
      * Helper method to convert a csv file to an associative array.
      *
+     * @since 1.0.0
+     *
      * @param string $filename Full filename to the csv file to process.
      * @param string $delimiter Optional delimiter to use if not standard ','.
      * @return array|bool Associative array or false if there was an issue parsing.
      */
-    private static function csvToArray($filename = '', $delimiter = ',')
+    private static function csvToArray($filename = '', $delimiter = ','): array
     {
         if (!file_exists($filename) || !is_readable($filename)) {
             return false;
@@ -230,5 +301,47 @@ class GenerateLotto
             fclose($handle);
         }
         return $data;
+    }
+
+    /**
+     * Generate lotto lines by iterating through most frequent machine, ball set and balls within that set.
+     *
+     * Will run through however many history draws there are available and generate as many lines as possible
+     * depending on the site of the data.
+     *
+     * @param array $draws The draws array to use.
+     * @return array Array of lines generated.
+     */
+    private static function generateMethod1(array $draws): array
+    {
+        $lines = [];
+        $machines = self::getMachineNames($draws);
+        foreach ($machines as $machine) {
+            // Loop through ball sets (for single machine).
+            $machineDraws = self::filterDrawsByMachine($draws, $machine);
+            $ballSets = self::getBallSets($machineDraws);
+            foreach ($ballSets as $ballSet) {
+                $filteredDraws = self::filterDrawsByBallSet($machineDraws, $ballSet);
+                $lines[] = self::getFrequentBalls($filteredDraws);
+            }
+        }
+
+        return $lines;
+    }
+
+    /**
+     * Generate lotto lines by finding balls that occurs most frequently across all data.
+     *
+     * Will run through however many history draws there are available and generate as many lines as possible
+     * depending on the site of the data.
+     *
+     * @param array $draws The draws array to use.
+     * @return array Array of lines generated.
+     */
+    private static function generateMethod2(array $draws): array
+    {
+        $lines = [];
+        $lines[] = self::getFrequentBalls($draws);
+        return $lines;
     }
 }
