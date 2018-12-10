@@ -12,6 +12,7 @@ namespace MarkHeydon;
 
 use MarkHeydon\LotteryGenerator\GenerateLotto;
 use Zend\Console\Adapter\AdapterInterface as Console;
+use Zend\Console\ColorInterface;
 use ZF\Console\Route;
 
 /**
@@ -30,12 +31,61 @@ class LotteryGeneratorCLI
      * @param Route $route The ZF\Console\Route instance from the Dispatcher.
      * @param Console $console The Zend\Console adapter currently in use.
      */
-    public function generateLotto(Route $route, Console $console)
+    public function generateLotto(Route $route, Console $console): void
     {
+        // Command line flags
+        $verboseMode = $route->getMatchedParam('verbose', false);
+        $includeOthers = $route->getMatchedParam('others', false);
+
+        // Lotto generator generates from a number of methods.  We want the first from each method as the
+        // 'suggested' numbers to use, followed by the rest.
         $generator = new GenerateLotto();
-        $result = $generator::generate();
+        $results = $generator::generate();
+
+        $suggested = [];
+        $others = [];
+        foreach ($results as $method) {
+            $suggested[] = array_shift($method);
+            if ($includeOthers) {
+                $others = array_merge($others, $method);
+            }
+        }
+
+        $console->writeLine('Suggested', ColorInterface::GREEN);
+        $console->writeLine('=========', ColorInterface::GREEN);
+        $console->writeLine();
+        LotteryGeneratorCLI::outputLines($console, $suggested);
+        $console->writeLine();
+
+        if (count($others) > 0) {
+            $console->writeLine('Others', ColorInterface::LIGHT_GREEN);
+            $console->writeLine('======', ColorInterface::LIGHT_GREEN);
+            $console->writeLine();
+            LotteryGeneratorCLI::outputLines($console, $others);
+            $console->writeLine();
+        }
+
+        if ($verboseMode) {
+            $console->writeLine();
+            $console->writeLine('Verbose', ColorInterface::RED);
+            $console->writeLine('=======', ColorInterface::RED);
+            // Iterate through all methods and results in verbose mode
+            foreach ($results as $method => $line) {
+                $console->writeLine('Method: ' . $method);
+                LotteryGeneratorCLI::outputLines($console, $line);
+                $console->writeLine();
+            }
+        }
+    }
+
+    /**
+     * @param Console $console
+     * @param $value
+     */
+    private static function outputLines(Console $console, array $lines): void
+    {
         $ctr = 0;
-        foreach ($result as $line) {
+        foreach ($lines as $line) {
             $ctr++;
             $console->writeLine('Line ' . $ctr . ': ' . implode(', ', $line));
         }

@@ -25,8 +25,15 @@ class GenerateLotto
         $allDraws = self::readLottoDrawHistory();
 
         // Build some generated lines of 'random' numbers and return
-        $lines = self::generateMethod2($allDraws);
-        $lines = array_merge($lines,self::generateMethod1($allDraws));
+        $linesMethod1 = self::generateMostFrequent($allDraws);
+        $linesMethod2 = self::generateMostFrequentTogether($allDraws);
+        $linesMethod3 = self::generateFullIteration($allDraws);
+
+        $lines = [
+            'method1' => $linesMethod1,
+            'method2' => $linesMethod2,
+            'method3' => $linesMethod3,
+        ];
         return $lines;
     }
 
@@ -140,19 +147,22 @@ class GenerateLotto
     }
 
     /**
-     * Returns array of balls that frequently occur together for the specified draws array.
+     * Returns array of balls that frequently occur for the specified draws array.
      *
      * @param array $draws The draws array to use.
+     * @param bool $together Balls that occur together?
      * @return array Array of balls.
      */
-    private static function getFrequentBalls(array $draws): array
+    private static function getFrequentlyOccurringBalls(array $draws, bool $together = true): array
     {
         // Want 6 numbers in total
         $results = [];
         $freqBall = self::calculateFrequentBall($draws);
         $results[] = $freqBall;
         for ($n = 1; $n < 6; $n++) {
-            $draws = self::filterDrawsByBall($draws, $freqBall);
+            if ($together) {
+                $draws = self::filterDrawsByBall($draws, $freqBall);
+            }
             $freqBall = self::calculateFrequentBall($draws, $results);
             $results[] = $freqBall;
         }
@@ -302,10 +312,12 @@ class GenerateLotto
      * Will run through however many history draws there are available and generate as many lines as possible
      * depending on the site of the data.
      *
+     * @since 1.0.0
+     *
      * @param array $draws The draws array to use.
      * @return array Array of lines generated.
      */
-    private static function generateMethod1(array $draws): array
+    private static function generateFullIteration(array $draws): array
     {
         $lines = [];
         $machines = self::getMachineNames($draws);
@@ -315,7 +327,7 @@ class GenerateLotto
             $ballSets = self::getBallSets($machineDraws);
             foreach ($ballSets as $ballSet) {
                 $filteredDraws = self::filterDrawsByBallSet($machineDraws, $ballSet);
-                $lines[] = self::getFrequentBalls($filteredDraws);
+                $lines[] = self::getFrequentlyOccurringBalls($filteredDraws);
             }
         }
 
@@ -323,18 +335,36 @@ class GenerateLotto
     }
 
     /**
-     * Generate lotto lines by finding balls that occurs most frequently across all data.
+     * Generate a lotto line by finding balls that occurs most frequently across all data together.
      *
-     * Will run through however many history draws there are available and generate as many lines as possible
-     * depending on the site of the data.
+     * I.e. looks for numbers that occur within the same lines together, not across the whole data set.
+     *
+     * @since 1.0.0
      *
      * @param array $draws The draws array to use.
      * @return array Array of lines generated.
      */
-    private static function generateMethod2(array $draws): array
+    private static function generateMostFrequentTogether(array $draws): array
     {
+        // return as array to keep consistence with other generate method(s)
         $lines = [];
-        $lines[] = self::getFrequentBalls($draws);
+        $lines[] = self::getFrequentlyOccurringBalls($draws);
+        return $lines;
+    }
+
+    /**
+     * Generate a lotto line by finding balls that occurs most frequently across all data.
+     *
+     * @since 1.0.0
+     *
+     * @param array $draws The draws array to use.
+     * @return array Array of lines generated.
+     */
+    private static function generateMostFrequent(array $draws): array
+    {
+        // return as array to keep consistence with other generate method(s)
+        $lines = [];
+        $lines[] = self::getFrequentlyOccurringBalls($draws, false);
         return $lines;
     }
 }

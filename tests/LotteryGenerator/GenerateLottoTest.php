@@ -22,8 +22,15 @@ class GenerateLottoTest extends TestCase
      */
     public function testGenerateReturnsArray()
     {
+        // check for 3 methods,
+        // and that each method has at least one result
         $var = GenerateLotto::generate();
-        $this->assertTrue(count($var) >= 2);
+        $this->assertCount(3, $var);
+        foreach ($var as $methodName => $method) {
+            $this->assertTrue(count($method) > 0,
+                'Method \'' . $methodName . '\' has count of ' . count($method));
+        }
+
     }
 
     /**
@@ -34,9 +41,12 @@ class GenerateLottoTest extends TestCase
     public function testGenerateLinesContainsSix()
     {
         $var = GenerateLotto::generate();
-        foreach ($var as $line) {
-            $this->assertCount(6, $line);
+        foreach ($var as $method) {
+            foreach ($method as $line) {
+                $this->assertCount(6, $line);
+            }
         }
+
     }
 
     /**
@@ -47,9 +57,11 @@ class GenerateLottoTest extends TestCase
     public function testGenerateResultsDontOverlap()
     {
         $var = GenerateLotto::generate();
-        foreach ($var as $line) {
-            $unique = array_unique($line);
-            $this->assertSame($line, $unique);
+        foreach ($var as $method) {
+            foreach ($method as $line) {
+                $unique = array_unique($line);
+                $this->assertSame($line, $unique);
+            }
         }
 
     }
