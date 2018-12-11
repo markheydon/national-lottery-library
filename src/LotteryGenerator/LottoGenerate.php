@@ -9,7 +9,7 @@
 
 namespace MarkHeydon\LotteryGenerator;
 
-class GenerateLotto
+class LottoGenerate
 {
     /**
      * Generate 'random' Lotto numbers.
@@ -240,9 +240,7 @@ class GenerateLotto
      */
     private static function readLottoDrawHistory(): array
     {
-        $filename = 'lotto-draw-history.csv';
-        $filepath = __DIR__ . '/../../data/' . $filename;
-        $results = self::csvToArray($filepath);
+        $results = self::csvToArray(LottoDownload::FILE_PATH);
 
         $allDraws = [];
         foreach ($results as $draw) {

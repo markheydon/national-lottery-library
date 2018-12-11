@@ -6,12 +6,9 @@
  */
 return [
     [
-        'name' => 'generate-lotto',
-        'handler' => [
-            new MarkHeydon\LotteryGeneratorCLI(),
-            'generateLotto'
-        ],
-        'route' => 'generate-lotto [--others] [--verbose]',
+        'name' => 'lotto-generate',
+        'handler' => 'MarkHeydon\LotteryGeneratorCLI::generateLotto',
+        'route' => 'lotto-generate [--others] [--verbose]',
         'description' => 'Generate random numbers for the Lotto game.',
         'short_description' => 'Generate random numbers for the Lotto game.',
         'options_descriptions' => [
@@ -19,4 +16,10 @@ return [
             '--verbose' => 'Include all method information.',
         ],
     ],
+    [
+        'name' => 'lotto-download',
+        'handler' => 'MarkHeydon\LotteryGeneratorCLI::downloadLotto',
+        'route' => 'lotto-download',
+        'description' => 'Download latest Lotto history draw file.',
+    ]
 ];

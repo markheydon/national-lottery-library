@@ -1,16 +1,16 @@
 <?php
 /**
- * Unit tests for GenerateLotto class.
+ * Unit tests for LottoGenerate class.
  *
  * @since 1.0.0
  */
 
 namespace MarkHeydonTest\LotteryGenerator;
 
-use MarkHeydon\LotteryGenerator\GenerateLotto;
+use MarkHeydon\LotteryGenerator\LottoGenerate;
 use PHPUnit\Framework\TestCase;
 
-class GenerateLottoTest extends TestCase
+class LottoGenerateTest extends TestCase
 {
     /**
      * Tests that generate returns at least two lines of results.
@@ -24,7 +24,7 @@ class GenerateLottoTest extends TestCase
     {
         // check for 3 methods,
         // and that each method has at least one result
-        $var = GenerateLotto::generate();
+        $var = LottoGenerate::generate();
         $this->assertCount(3, $var);
         foreach ($var as $methodName => $method) {
             $this->assertTrue(count($method) > 0,
@@ -40,7 +40,7 @@ class GenerateLottoTest extends TestCase
      */
     public function testGenerateLinesContainsSix()
     {
-        $var = GenerateLotto::generate();
+        $var = LottoGenerate::generate();
         foreach ($var as $method) {
             foreach ($method as $line) {
                 $this->assertCount(6, $line);
@@ -56,7 +56,7 @@ class GenerateLottoTest extends TestCase
      */
     public function testGenerateResultsDontOverlap()
     {
-        $var = GenerateLotto::generate();
+        $var = LottoGenerate::generate();
         foreach ($var as $method) {
             foreach ($method as $line) {
                 $unique = array_unique($line);

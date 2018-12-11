@@ -10,7 +10,8 @@
 
 namespace MarkHeydon;
 
-use MarkHeydon\LotteryGenerator\GenerateLotto;
+use MarkHeydon\LotteryGenerator\LottoDownload;
+use MarkHeydon\LotteryGenerator\LottoGenerate;
 use Zend\Console\Adapter\AdapterInterface as Console;
 use Zend\Console\ColorInterface;
 use ZF\Console\Route;
@@ -22,6 +23,25 @@ use ZF\Console\Route;
  */
 class LotteryGeneratorCLI
 {
+    /**
+     * Download Lotto draw history file and report success (or failure).
+     *
+     * @since 1.0.0
+     * @codeCoverageIgnore
+     *
+     * @param Route $route The ZF\Console\Route instance from the Dispatcher.
+     * @param Console $console The Zend\Console adapter currently in use.
+     */
+    public static function downloadLotto(Route $route, Console $console): void
+    {
+        $success = LottoDownload::download();
+        if (strlen($success) < 1) {
+            $console->writeLine('Success.', ColorInterface::GREEN);
+        } else {
+            $console->writeLine('Failed: ' . $success . '.', ColorInterface::RED);
+        }
+    }
+
     /**
      * Generate Lotto numbers and output.
      *
@@ -39,8 +59,7 @@ class LotteryGeneratorCLI
 
         // Lotto generator generates from a number of methods.  We want the first from each method as the
         // 'suggested' numbers to use, followed by the rest.
-        $generator = new GenerateLotto();
-        $results = $generator::generate();
+        $results = LottoGenerate::generate();
 
         $suggested = [];
         $others = [];
@@ -87,7 +106,15 @@ class LotteryGeneratorCLI
         $ctr = 0;
         foreach ($lines as $line) {
             $ctr++;
-            $console->writeLine('Line ' . $ctr . ': ' . implode(', ', $line));
+            $console->write('Line ' . $ctr . ': ');
+            while (($ball = array_shift($line)) !== null) {
+                $console->write(str_pad($ball, 2, '0', STR_PAD_LEFT));
+                if (count($line) > 0) {
+                    $console->write(' - ');
+                }
+            }
+            $console->write(implode(' - ', $line));
+            $console->writeLine();
         }
     }
 }
