@@ -11,6 +11,7 @@
 namespace MarkHeydon;
 
 use MarkHeydon\LotteryGenerator\EuromillionsDownload;
+use MarkHeydon\LotteryGenerator\EuromillionsGenerate;
 use MarkHeydon\LotteryGenerator\LottoDownload;
 use MarkHeydon\LotteryGenerator\LottoGenerate;
 use Zend\Console\Adapter\AdapterInterface as Console;
@@ -71,15 +72,43 @@ class LotteryGeneratorCLI
      * @param Route $route The ZF\Console\Route instance from the Dispatcher.
      * @param Console $console The Zend\Console adapter currently in use.
      */
-    public function generateLotto(Route $route, Console $console): void
+    public static function generateLotto(Route $route, Console $console): void
+    {
+        // Generator generates from a number of methods.  We want the first from each method as the
+        // 'suggested' numbers to use, followed by the rest.
+        $results = LottoGenerate::generate();
+        self::outputSuggestedEtc($route, $console, $results);
+    }
+
+    /**
+     * Generate EuroMillions numbers and output.
+     *
+     * @since 1.0.0
+     * @codeCoverageIgnore
+     *
+     * @param Route $route The ZF\Console\Route instance from the Dispatcher.
+     * @param Console $console The Zend\Console adapter currently in use.
+     */
+    public static function generateEuromillions(Route $route, Console $console): void
+    {
+        // Generator generates from a number of methods.  We want the first from each method as the
+        // 'suggested' numbers to use, followed by the rest.
+        $results = EuromillionsGenerate::generate();
+        self::outputSuggestedEtc($route, $console, $results);
+    }
+
+    /**
+     * Output results formatted by suggested etc.
+     *
+     * @param Route $route The ZF\Console\Route instance from the Dispatcher.
+     * @param Console $console The Zend\Console adapter currently in use.
+     * @param array $results Results array to output.
+     */
+    private static function outputSuggestedEtc(Route $route, Console $console, array $results): void
     {
         // Command line flags
         $verboseMode = $route->getMatchedParam('verbose', false);
         $includeOthers = $route->getMatchedParam('others', false);
-
-        // Lotto generator generates from a number of methods.  We want the first from each method as the
-        // 'suggested' numbers to use, followed by the rest.
-        $results = LottoGenerate::generate();
 
         $suggested = [];
         $others = [];
@@ -118,8 +147,10 @@ class LotteryGeneratorCLI
     }
 
     /**
-     * @param Console $console
-     * @param $value
+     * Output the numbers from the array of passed in lines.
+     *
+     * @param Console $console Console object to output to.
+     * @param array $lines Lines to output.
      */
     private static function outputLines(Console $console, array $lines): void
     {
@@ -127,14 +158,38 @@ class LotteryGeneratorCLI
         foreach ($lines as $line) {
             $ctr++;
             $console->write('Line ' . $ctr . ': ');
-            while (($ball = array_shift($line)) !== null) {
-                $console->write(str_pad($ball, 2, '0', STR_PAD_LEFT));
-                if (count($line) > 0) {
-                    $console->write(' - ');
+            if (isset($line['luckyStars'])) { // is EuroMillions
+                $aLine = $line['normal'];
+                while (($ball = array_shift($aLine)) !== null) {
+                    $console->write(str_pad($ball, 2, '0', STR_PAD_LEFT));
+                    if (count($aLine) > 0) {
+                        $console->write(' - ');
+                    }
                 }
+                $console->write(implode(' - ', $aLine));
+
+                $console->write('    ');
+
+                $aLine = $line['luckyStars'];
+                while (($ball = array_shift($aLine)) !== null) {
+                    $console->write(str_pad($ball, 2, '0', STR_PAD_LEFT));
+                    if (count($aLine) > 0) {
+                        $console->write(' - ');
+                    }
+                }
+                $console->write(implode(' - ', $aLine));
+
+                $console->writeLine();
+            } else {
+                while (($ball = array_shift($line)) !== null) {
+                    $console->write(str_pad($ball, 2, '0', STR_PAD_LEFT));
+                    if (count($line) > 0) {
+                        $console->write(' - ');
+                    }
+                }
+                $console->write(implode(' - ', $line));
+                $console->writeLine();
             }
-            $console->write(implode(' - ', $line));
-            $console->writeLine();
         }
     }
 }
