@@ -29,7 +29,7 @@ class Downloader
      *
      * @return string Full path of the download file.
      */
-    private function filePath(): string
+    public function filePath(): string
     {
         return self::DATA_PATH . '/' . $this->filename . '.csv';
     }

@@ -240,7 +240,7 @@ class LottoGenerate
      */
     private static function readLottoDrawHistory(): array
     {
-        $results = self::csvToArray(LottoDownload::FILE_PATH);
+        $results = self::csvToArray(LottoDownload::filePath());
 
         $allDraws = [];
         foreach ($results as $draw) {
