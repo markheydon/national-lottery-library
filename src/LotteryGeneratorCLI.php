@@ -10,6 +10,7 @@
 
 namespace MarkHeydon;
 
+use MarkHeydon\LotteryGenerator\EuromillionsDownload;
 use MarkHeydon\LotteryGenerator\LottoDownload;
 use MarkHeydon\LotteryGenerator\LottoGenerate;
 use Zend\Console\Adapter\AdapterInterface as Console;
@@ -35,6 +36,25 @@ class LotteryGeneratorCLI
     public static function downloadLotto(Route $route, Console $console): void
     {
         $success = LottoDownload::download();
+        if (strlen($success) < 1) {
+            $console->writeLine('Success.', ColorInterface::GREEN);
+        } else {
+            $console->writeLine('Failed: ' . $success . '.', ColorInterface::RED);
+        }
+    }
+
+    /**
+     * Download Lotto draw history file and report success (or failure).
+     *
+     * @since 1.0.0
+     * @codeCoverageIgnore
+     *
+     * @param Route $route The ZF\Console\Route instance from the Dispatcher.
+     * @param Console $console The Zend\Console adapter currently in use.
+     */
+    public static function downloadEuromillions(Route $route, Console $console): void
+    {
+        $success = EuromillionsDownload::download();
         if (strlen($success) < 1) {
             $console->writeLine('Success.', ColorInterface::GREEN);
         } else {

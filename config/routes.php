@@ -21,5 +21,11 @@ return [
         'handler' => 'MarkHeydon\LotteryGeneratorCLI::downloadLotto',
         'route' => 'lotto-download',
         'description' => 'Download latest Lotto history draw file.',
-    ]
+    ],
+    [
+        'name' => 'euromillions-download',
+        'handler' => 'MarkHeydon\LotteryGeneratorCLI::downloadEuromillions',
+        'route' => 'euromillions-download',
+        'description' => 'Download latest EuroMillions history draw file.',
+    ],
 ];

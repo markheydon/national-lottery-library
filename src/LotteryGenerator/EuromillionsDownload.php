@@ -10,7 +10,7 @@
 namespace MarkHeydon\LotteryGenerator;
 
 
-class LottoDownload
+class EuromillionsDownload
 {
     /**
      * Download the Lotto draw history file.
@@ -21,8 +21,8 @@ class LottoDownload
      */
     public static function download(): string
     {
-        $url = 'https://www.national-lottery.co.uk/results/lotto/draw-history/csv';
-        $filename = 'lotto-draw-history';
+        $url = 'https://www.national-lottery.co.uk/results/euromillions/draw-history/csv';
+        $filename = 'euromillions-draw-history';
         $downloader = new Downloader($url, $filename);
         return $downloader->download();
     }
