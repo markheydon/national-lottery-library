@@ -153,7 +153,7 @@ class LottoGenerate
      * @param bool $together Balls that occur together?
      * @return array Array of balls.
      */
-    private static function getFrequentlyOccurringBalls(array $draws, bool $together = true): array
+    private static function getFrequentlyOccurringBalls(array $draws, bool $together): array
     {
         // Want 6 numbers in total
         $results = [];
@@ -232,7 +232,7 @@ class LottoGenerate
     }
 
     /**
-     * Uses the lotto-draw-history.csv file in the data directory to return a draws array.
+     * Uses the Lotto draw history file in the data directory to return a draws array.
      *
      * @since 1.0.0
      *
@@ -240,7 +240,7 @@ class LottoGenerate
      */
     private static function readLottoDrawHistory(): array
     {
-        $results = self::csvToArray(LottoDownload::filePath());
+        $results = Utils::csvToArray(LottoDownload::filePath());
 
         $allDraws = [];
         foreach ($results as $draw) {
@@ -279,32 +279,6 @@ class LottoGenerate
     }
 
     /**
-     * Helper method to convert a csv file to an associative array.
-     *
-     * @since 1.0.0
-     *
-     * @param string $filename Full filename to the csv file to process.
-     * @param string $delimiter Optional delimiter to use if not standard ','.
-     * @return array|bool Associative array or false if there was an issue parsing.
-     */
-    private static function csvToArray($filename = '', $delimiter = ','): array
-    {
-        $header = null;
-        $data = [];
-        if (($handle = fopen($filename, 'r')) !== false) {
-            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
-                if (!$header) {
-                    $header = $row;
-                } else {
-                    $data[] = array_combine($header, $row);
-                }
-            }
-            fclose($handle);
-        }
-        return $data;
-    }
-
-    /**
      * Generate lotto lines by iterating through most frequent machine, ball set and balls within that set.
      *
      * Will run through however many history draws there are available and generate as many lines as possible
@@ -325,7 +299,7 @@ class LottoGenerate
             $ballSets = self::getBallSets($machineDraws);
             foreach ($ballSets as $ballSet) {
                 $filteredDraws = self::filterDrawsByBallSet($machineDraws, $ballSet);
-                $lines[] = self::getFrequentlyOccurringBalls($filteredDraws);
+                $lines[] = self::getFrequentlyOccurringBalls($filteredDraws, true);
             }
         }
 
@@ -346,7 +320,7 @@ class LottoGenerate
     {
         // return as array to keep consistence with other generate method(s)
         $lines = [];
-        $lines[] = self::getFrequentlyOccurringBalls($draws);
+        $lines[] = self::getFrequentlyOccurringBalls($draws, true);
         return $lines;
     }
 

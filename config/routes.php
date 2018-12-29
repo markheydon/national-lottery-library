@@ -17,6 +17,17 @@ return [
         ],
     ],
     [
+        'name' => 'euromillions-generate',
+        'handler' => 'MarkHeydon\LotteryGeneratorCLI::generateEuromillions',
+        'route' => 'euromillions-generate [--others] [--verbose]',
+        'description' => 'Generate random numbers for the EuroMillions game.',
+        'short_description' => 'Generate random numbers for the EuroMillions game.',
+        'options_descriptions' => [
+            '--others' => 'Include other lines, not just suggested.',
+            '--verbose' => 'Include all method information.',
+        ],
+    ],
+    [
         'name' => 'lotto-download',
         'handler' => 'MarkHeydon\LotteryGeneratorCLI::downloadLotto',
         'route' => 'lotto-download',
