@@ -1,14 +1,16 @@
 <?php
 /**
  * Helper class to generate numbers for the EuroMillions game.
- *
- * @package MarkHeydon
- * @subpackage MarkHeydon\LotteryGenerator
- * @since 1.0.0
  */
 
 namespace MarkHeydon\LotteryGenerator;
 
+/**
+ * Helper class to generate numbers for the EuroMillions game.
+ *
+ * @package MarkHeydon\LotteryGenerator
+ * @since 1.0.0
+ */
 class EuromillionsGenerate
 {
     /**
@@ -22,11 +24,11 @@ class EuromillionsGenerate
     {
         // @todo: Download results periodically -- only updated weekly I think?
         // Currently using a lotto-draw-history.csv file but should download and/or utilize a database.
-        $allDraws = self::readEuromillionsDrawHistory();
+        $allDraws = EuromillionsDownload::readEuromillionsDrawHistory();
 
         // Build some generated lines of 'random' numbers and return
-        $linesMethod1 = self::generateMostFrequent($allDraws);
-        $linesMethod2 = self::generateMostFrequentTogether($allDraws);
+        $linesMethod1 = self::generateMostFrequentTogether($allDraws);
+        $linesMethod2 = self::generateMostFrequent($allDraws);
 
         $lines = [
             'method1' => $linesMethod1,
@@ -36,50 +38,7 @@ class EuromillionsGenerate
     }
 
     /**
-     * Uses the Lotto draw history file in the data directory to return a draws array.
-     *
-     * @since 1.0.0
-     *
-     * @return array The draws array.
-     */
-    private static function readEuromillionsDrawHistory(): array
-    {
-        $results = Utils::csvToArray(EuromillionsDownload::filePath());
-
-        $allDraws = [];
-        foreach ($results as $draw) {
-            $drawDate = $draw['DrawDate'];
-            $ball1 = $draw['Ball 1'];
-            $ball2 = $draw['Ball 2'];
-            $ball3 = $draw['Ball 3'];
-            $ball4 = $draw['Ball 4'];
-            $ball5 = $draw['Ball 5'];
-            $luckyStar1 = $draw['Lucky Star 1'];
-            $luckyStar2 = $draw['Lucky Star 2'];
-            $raffles = explode(',', $draw['UK Millionaire Maker']);
-            $drawNumber = $draw['DrawNumber'];
-            $dayOfDraw = date('l', strtotime($drawDate));
-
-            $allDraws[] = [
-                'drawNumber' => $drawNumber,
-                'drawDate' => $drawDate,
-                'drawDay' => $dayOfDraw,
-                'ball1' => $ball1,
-                'ball2' => $ball2,
-                'ball3' => $ball3,
-                'ball4' => $ball4,
-                'ball5' => $ball5,
-                'luckyStar1' => $luckyStar1,
-                'luckyStar2' => $luckyStar2,
-                'raffles' => $raffles,
-            ];
-        }
-
-        return $allDraws;
-    }
-
-    /**
-     * Generate a euromillions line by finding balls that occurs most frequently across all data.
+     * Generate a EuroMillions line by finding balls that occurs most frequently across all data.
      *
      * @since 1.0.0
      *
@@ -112,8 +71,6 @@ class EuromillionsGenerate
         return $lines;
     }
 
-
-
     /**
      * Returns array of balls that frequently occur for the specified draws array.
      *
@@ -123,26 +80,10 @@ class EuromillionsGenerate
      */
     private static function getFrequentlyOccurringBalls(array $draws, bool $together): array
     {
-        // Want 5 normal balls
-        $normalBalls = [];
-        $freqBall = self::calculateFrequentNormalBall($draws);
-        $normalBalls[] = $freqBall;
-        for ($n = 1; $n < 5; $n++) {
-            if ($together) {
-                $draws = self::filterDrawsByNormalBall($draws, $freqBall);
-            }
-            $freqBall = self::calculateFrequentNormalBall($draws, $normalBalls);
-            $normalBalls[] = $freqBall;
-        }
-        asort($normalBalls);
-
-        // And 2 lucky stars
-        $luckyStars = [];
-        $freqBall = self::calculateFrequentLuckyStar($draws);
-        $luckyStars[] = $freqBall;
-        $freqBall = self::calculateFrequentLuckyStar($draws, $luckyStars);
-        $luckyStars[] = $freqBall;
-        asort($luckyStars);
+        $normalBalls = Utils::getFrequentlyOccurringBalls(
+            $draws, self::getNormalBallNames(), 5, $together);
+        $luckyStars = Utils::getFrequentlyOccurringBalls(
+            $draws, self::getLuckyStarNames(), 2, $together);
 
         // Return results array
         $results = [
@@ -153,88 +94,32 @@ class EuromillionsGenerate
     }
 
     /**
-     * Calculate the most frequently occurring ball normal value from the specified draws array.
+     * Array of normal ball names.
      *
-     * Looks through all the draws and counts the number of times a ball value occurs
-     * and return the highest count value.  Optionally excludes the specified ball values.
-     *
-     * @since 1.0.0
-     *
-     * @param array $draws The draws array.
-     * @param array $except Optional array of ball values to ignore from the count.
-     * @return int Ball value of the most frequently occurring or 0 if draws array is empty.
+     * @return array Array of normal ball names.
      */
-    private static function calculateFrequentNormalBall(array $draws, array $except = []): int
+    private static function getNormalBallNames(): array
     {
-        $ballCount = [];
-        foreach ($draws as $draw) {
-            for ($b = 1; $b <= 5; $b++) {
-                $ballNumber = 'ball' . $b;
-                $ballValue = $draw[$ballNumber];
-                if (!in_array($ballValue, $except)) {
-                    if (!isset($ballCount[$ballValue])) {
-                        $ballCount[$ballValue] = 1;
-                    } else {
-                        $ballCount[$ballValue]++;
-                    }
-                }
-            }
+        $ballNames = [];
+        for ($b = 1; $b <= 5; $b++) {
+            $ballNumber = 'ball' . $b;
+            $ballNames[] = $ballNumber;
         }
-        arsort($ballCount);
-        reset($ballCount);
-        return (int)key($ballCount) ?? 0;
+        return $ballNames;
     }
 
     /**
-     * Calculate the most frequently occurring ball lucky star from the specified draws array.
+     * Array of Lucky Star ball names.
      *
-     * Looks through all the draws and counts the number of times a ball value occurs
-     * and return the highest count value.  Optionally excludes the specified ball values.
-     *
-     * @since 1.0.0
-     *
-     * @param array $draws The draws array.
-     * @param array $except Optional array of ball values to ignore from the count.
-     * @return int Ball value of the most frequently occurring or 0 if draws array is empty.
+     * @return array Array of Lucky Star ball names.
      */
-    private static function calculateFrequentLuckyStar(array $draws, array $except = []): int
+    private static function getLuckyStarNames(): array
     {
-        $ballCount = [];
-        foreach ($draws as $draw) {
-            for ($b = 1; $b <= 2; $b++) {
-                $ballNumber = 'luckyStar' . $b;
-                $ballValue = $draw[$ballNumber];
-                if (!in_array($ballValue, $except)) {
-                    if (!isset($ballCount[$ballValue])) {
-                        $ballCount[$ballValue] = 1;
-                    } else {
-                        $ballCount[$ballValue]++;
-                    }
-                }
-            }
+        $ballNames = [];
+        for ($b = 1; $b <= 2; $b++) {
+            $ballNumber = 'luckyStar' . $b;
+            $ballNames[] = $ballNumber;
         }
-        arsort($ballCount);
-        reset($ballCount);
-        return (int)key($ballCount) ?? 0;
+        return $ballNames;
     }
-
-    /**
-     * Filter the specified draws array by the specified ball number (value).
-     *
-     * @since 1.0.0
-     *
-     * @param array $draws Array of draws.
-     * @param int $ball Ball value number to filter by.
-     * @return array Filtered array of draws.
-     */
-    private static function filterDrawsByNormalBall(array $draws, int $ball): array
-    {
-        $filteredDraws = array_filter($draws, function ($draw) use ($ball) {
-            $result = $draw['ball1'] == $ball || $draw['ball2'] == $ball || $draw['ball3'] == $ball ||
-                $draw['ball4'] == $ball || $draw['ball5'] == $ball;
-            return $result;
-        });
-        return $filteredDraws;
-    }
-
 }
