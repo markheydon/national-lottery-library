@@ -1,14 +1,16 @@
 <?php
 /**
  * Helper class to generate numbers for the Lotto game.
- *
- * @package MarkHeydon
- * @subpackage MarkHeydon\LotteryGenerator
- * @since 1.0.0
  */
 
 namespace MarkHeydon\LotteryGenerator;
 
+/**
+ * Helper class to generate numbers for the Lotto game.
+ *
+ * @package MarkHeydon\LotteryGenerator
+ * @since 1.0.0
+ */
 class LottoGenerate
 {
     /**
@@ -22,11 +24,11 @@ class LottoGenerate
     {
         // @todo: Download results periodically -- only updated weekly I think?
         // Currently using a lotto-draw-history.csv file but should download and/or utilize a database.
-        $allDraws = self::readLottoDrawHistory();
+        $allDraws = LottoDownload::readLottoDrawHistory();
 
         // Build some generated lines of 'random' numbers and return
-        $linesMethod1 = self::generateMostFrequent($allDraws);
-        $linesMethod2 = self::generateMostFrequentTogether($allDraws);
+        $linesMethod1 = self::generateMostFrequentTogether($allDraws);
+        $linesMethod2 = self::generateMostFrequent($allDraws);
         $linesMethod3 = self::generateFullIteration($allDraws);
 
         $lines = [
@@ -207,75 +209,6 @@ class LottoGenerate
         arsort($ballCount);
         reset($ballCount);
         return (int)key($ballCount) ?? 0;
-    }
-
-    /**
-     * Returns array of raffle numbers from the specified string.
-     *
-     * CSV history file seems to be in the format 'RAF;RAF,RAF,RAF'.
-     *
-     * @since 1.0.0
-     *
-     * @param string $raffles String from CSV history file for field 'Raffles'.
-     * @return array Array of strings of all the raffles numbers from the specified string.
-     */
-    private static function parseRafflesString(string $raffles): array
-    {
-        if (empty($raffles)) {
-            return [];
-        }
-        $split = explode(';', $raffles);
-        $first = $split[0];
-        $others = explode(',', $split[1]);
-        $result = array_merge([$first], $others);
-        return $result;
-    }
-
-    /**
-     * Uses the Lotto draw history file in the data directory to return a draws array.
-     *
-     * @since 1.0.0
-     *
-     * @return array The draws array.
-     */
-    private static function readLottoDrawHistory(): array
-    {
-        $results = Utils::csvToArray(LottoDownload::filePath());
-
-        $allDraws = [];
-        foreach ($results as $draw) {
-            $drawDate = $draw['DrawDate'];
-            $ball1 = $draw['Ball 1'];
-            $ball2 = $draw['Ball 2'];
-            $ball3 = $draw['Ball 3'];
-            $ball4 = $draw['Ball 4'];
-            $ball5 = $draw['Ball 5'];
-            $ball6 = $draw['Ball 6'];
-            $bonusBall = $draw['Bonus Ball'];
-            $ballSet = $draw['Ball Set'];
-            $machine = $draw['Machine'];
-            $raffles = self::parseRafflesString($draw['Raffles']);
-            $drawNumber = $draw['DrawNumber'];
-            $dayOfDraw = date('l', strtotime($drawDate));
-
-            $allDraws[] = [
-                'drawNumber' => $drawNumber,
-                'drawDate' => $drawDate,
-                'drawDay' => $dayOfDraw,
-                'ball1' => $ball1,
-                'ball2' => $ball2,
-                'ball3' => $ball3,
-                'ball4' => $ball4,
-                'ball5' => $ball5,
-                'ball6' => $ball6,
-                'bonusBall' => $bonusBall,
-                'ballSet' => $ballSet,
-                'machine' => $machine,
-                'raffles' => $raffles,
-            ];
-        }
-
-        return $allDraws;
     }
 
     /**

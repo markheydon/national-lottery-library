@@ -1,15 +1,16 @@
 <?php
 /**
  * Helper class to download draw history files.
- *
- * @package MarkHeydon
- * @subpackage MarkHeydon\LotteryGenerator
- * @since 1.0.0
  */
 
 namespace MarkHeydon\LotteryGenerator;
 
-
+/**
+ * Helper class to download draw history files.
+ *
+ * @package MarkHeydon\LotteryGenerator
+ * @since 1.0.0
+ */
 class Downloader
 {
     /** @var string The data folder path. */

@@ -1,24 +1,25 @@
 <?php
 /**
  * Unit tests for LottoGenerate class.
- *
- * @since 1.0.0
  */
 
-namespace MarkHeydonTest\LotteryGenerator;
+namespace MarkHeydonTests\LotteryGenerator;
 
 use MarkHeydon\LotteryGenerator\LottoGenerate;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Unit tests for LottoGenerate class.
+ *
+ * @package MarkHeydonTests\LotteryGenerator
+ */
 class LottoGenerateTest extends TestCase
 {
     /**
-     * Tests that generate returns at least two lines of results.
+     * Tests that generate returns at least three lines of results.
      *
-     * Has to, in theory, generate two as both generate methods will always return at least one line
+     * Has to, in theory, generate three as generate methods will always return at least one line
      * when there is data available.
-     *
-     * @since 1.0.0
      */
     public function testGenerateReturnsArray()
     {
@@ -35,8 +36,6 @@ class LottoGenerateTest extends TestCase
 
     /**
      * Tests that the generated lines all contain 6 numbers.
-     *
-     * @since 1.0.0
      */
     public function testGenerateLinesContainsSix()
     {
@@ -51,8 +50,6 @@ class LottoGenerateTest extends TestCase
 
     /**
      * Tests to make sure there are no duplicates in the lines generated.
-     *
-     * @since 1.0.0
      */
     public function testGenerateResultsDontOverlap()
     {

@@ -1,11 +1,6 @@
 <?php
 /**
  * Lottery Generator CLI Handler.
- *
- * Dispatches commands off to relevant class.
- *
- * @package MarkHeydon
- * @since 1.0.0
  */
 
 namespace MarkHeydon;
@@ -19,8 +14,11 @@ use Zend\Console\ColorInterface;
 use ZF\Console\Route;
 
 /**
- * Class LotteryGeneratorCLI
+ * Lottery Generator CLI Handler.
  *
+ * Dispatches commands off to relevant class.
+ *
+ * @package MarkHeydon
  * @since 1.0.0
  */
 class LotteryGeneratorCLI
