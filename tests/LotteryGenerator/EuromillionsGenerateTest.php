@@ -23,15 +23,14 @@ class EuromillionsGenerateTest extends TestCase
      */
     public function testGenerateReturnsArray()
     {
-        // check for 2 methods,
+        // check for 3 methods,
         // and that each method has at least one result
         $var = EuromillionsGenerate::generate();
-        $this->assertCount(2, $var);
+        $this->assertCount(3, $var);
         foreach ($var as $methodName => $method) {
             $this->assertTrue(count($method) > 0,
                 'Method \'' . $methodName . '\' has count of ' . count($method));
         }
-
     }
 
     /**

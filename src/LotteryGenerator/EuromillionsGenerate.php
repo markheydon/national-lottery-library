@@ -29,10 +29,12 @@ class EuromillionsGenerate
         // Build some generated lines of 'random' numbers and return
         $linesMethod1 = self::generateMostFrequentTogether($allDraws);
         $linesMethod2 = self::generateMostFrequent($allDraws);
+        $linesMethod3 = self::generateFullIteration($allDraws);
 
         $lines = [
             'method1' => $linesMethod1,
             'method2' => $linesMethod2,
+            'method3' => $linesMethod3,
         ];
         return $lines;
     }
@@ -121,5 +123,54 @@ class EuromillionsGenerate
             $ballNames[] = $ballNumber;
         }
         return $ballNames;
+    }
+
+    /**
+     * Generate Euro Million lines by iterating through most frequent day and balls within each day.
+     *
+     * Will run through however many history draws there are available and generate as many lines as possible
+     * depending on the site of the data.
+     *
+     * @since 1.0.0
+     *
+     * @param array $draws The draws array to use.
+     * @return array Array of lines generated.
+     */
+    private static function generateFullIteration(array $draws): array
+    {
+        $lines = [];
+        $days = self::getDrawDays($draws);
+        foreach ($days as $day) {
+            $dayDraws = self::filterDrawsByDay($draws, $day);
+            $lines[] = self::getFrequentlyOccurringBalls($dayDraws, true);
+        }
+        return $lines;
+    }
+
+    /**
+     * Return list of days used in the supplied draws array.
+     *
+     * @param array $draws The draws array.
+     * @return array Array of day names.
+     */
+    private static function getDrawDays(array $draws): array
+    {
+        $machineCount = Utils::getCount($draws, ['drawDay']);
+        arsort($machineCount);
+        reset($machineCount);
+        return array_keys($machineCount);
+    }
+
+    /**
+     * Filter the supplied draws array by the specified draw day.
+     *
+     * @param array $draws The draws array.
+     * @param string $day The day to filter the draws array by.
+     * @return array The filtered draws array.
+     */
+    private static function filterDrawsByDay(array $draws, string $day): array
+    {
+        $dayDraws = Utils::filterDrawsBy(['drawDay'], $draws, $day);
+        return $dayDraws;
     }
 }
