@@ -3,6 +3,8 @@
  * Helper class to generate numbers for the EuroMillions game.
  */
 
+declare(strict_types=1);
+
 namespace MarkHeydon\LotteryGenerator;
 
 /**

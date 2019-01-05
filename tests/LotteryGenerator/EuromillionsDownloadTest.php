@@ -3,6 +3,8 @@
  * Unit tests for EuromillionsDownload class.
  */
 
+declare(strict_types=1);
+
 namespace MarkHeydonTests\LotteryGenerator;
 
 use MarkHeydon\LotteryGenerator\EuromillionsDownload;

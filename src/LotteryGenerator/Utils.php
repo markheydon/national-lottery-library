@@ -3,6 +3,8 @@
  * Various helper/utility methods.
  */
 
+declare(strict_types=1);
+
 namespace MarkHeydon\LotteryGenerator;
 
 /**

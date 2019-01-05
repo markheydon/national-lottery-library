@@ -3,6 +3,8 @@
  * Helper class to download Lotto draw history file.
  */
 
+declare(strict_types=1);
+
 namespace MarkHeydon\LotteryGenerator;
 
 /**

@@ -1,6 +1,8 @@
 <?php
 /** Base Test Case for Download lottery unit tests. */
 
+declare(strict_types=1);
+
 namespace MarkHeydonTests\LotteryGenerator;
 
 use PHPUnit\Framework\TestCase;

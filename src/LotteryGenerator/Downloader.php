@@ -3,6 +3,8 @@
  * Helper class to download draw history files.
  */
 
+declare(strict_types=1);
+
 namespace MarkHeydon\LotteryGenerator;
 
 /**

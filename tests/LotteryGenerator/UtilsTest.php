@@ -1,8 +1,9 @@
 <?php
-
 /**
  * Unit tests for Utils class.
  */
+
+declare(strict_types=1);
 
 namespace MarkHeydonTests\LotteryGenerator;
 

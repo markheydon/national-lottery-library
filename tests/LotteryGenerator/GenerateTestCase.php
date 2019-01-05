@@ -3,6 +3,8 @@
  * Base Test Case for Generate lottery unit tests.
  */
 
+declare(strict_types=1);
+
 namespace MarkHeydonTests\LotteryGenerator;
 
 use PHPUnit\Framework\TestCase;
