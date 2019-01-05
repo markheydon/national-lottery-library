@@ -3,6 +3,8 @@
  * Helper class to generate numbers for the EuroMillions game.
  */
 
+declare(strict_types=1);
+
 namespace MarkHeydon\LotteryGenerator;
 
 /**
@@ -98,9 +100,17 @@ class EuromillionsGenerate
     private static function getFrequentlyOccurringBalls(array $draws, bool $together): array
     {
         $normalBalls = Utils::getFrequentlyOccurringBalls(
-            $draws, self::getNormalBallNames(), 5, $together);
+            $draws,
+            self::getNormalBallNames(),
+            5,
+            $together
+        );
         $luckyStars = Utils::getFrequentlyOccurringBalls(
-            $draws, self::getLuckyStarNames(), 2, $together);
+            $draws,
+            self::getLuckyStarNames(),
+            2,
+            $together
+        );
 
         // Return results array
         $results = [

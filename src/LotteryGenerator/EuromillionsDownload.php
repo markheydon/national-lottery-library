@@ -3,6 +3,8 @@
  * Helper class to download Lotto draw history file.
  */
 
+declare(strict_types=1);
+
 namespace MarkHeydon\LotteryGenerator;
 
 /**
@@ -22,13 +24,14 @@ class EuromillionsDownload
      * Download the Lotto draw history file.
      *
      * @since 1.0.0
-     *
+     * @param bool $failDownload Simulate failed download (for testing).
+     * @param bool $failRename Simulate failed rename of temp file (for testing).
      * @return string Error string on failure, otherwise empty string.
      */
-    public static function download(): string
+    public static function download($failDownload = false, $failRename = false): string
     {
         $downloader = new Downloader(self::HISTORY_DOWNLOAD_URL, self::FILENAME);
-        return $downloader->download();
+        return $downloader->download($failDownload, $failRename);
     }
 
     /**
@@ -84,5 +87,4 @@ class EuromillionsDownload
         $downloader = new Downloader(self::HISTORY_DOWNLOAD_URL, self::FILENAME);
         return $downloader->filePath();
     }
-
 }

@@ -3,6 +3,8 @@
  * Helper class to download draw history files.
  */
 
+declare(strict_types=1);
+
 namespace MarkHeydon\LotteryGenerator;
 
 /**
@@ -54,9 +56,11 @@ class Downloader
      *
      * @since 1.0.0
      *
+     * @param bool $failDownload Simulate failed download (for testing).
+     * @param bool $failRename Simulate failed renaming of temp file (for testing).
      * @return string Error string on failure, otherwise empty string.
      */
-    public function download(): string
+    public function download(bool $failDownload = false, bool $failRename = false): string
     {
         // workout a filename to rename the current file to (if there is one)
         $timestamp = date('YmdHis', time());
@@ -67,20 +71,17 @@ class Downloader
         // if it worked, then rename existing and replace with new
         // otherwise report failure
         $tempFilename = tempnam(sys_get_temp_dir(), 'lotto-draw-history');
-        $result = file_put_contents($tempFilename, fopen($this->url, 'r'));
-        if (false === $result) {
+        $downloadResult = $failDownload ? false : file_put_contents($tempFilename, fopen($this->url, 'r'));
+        if (false === $downloadResult) {
             return 'Download failed';
         }
         if (strlen($renameFilepath) > 0) {
-            $result = rename($this->filePath(), $renameFilepath);
-            if (false === $result) {
+            $renameResult = $failRename ? false : rename($this->filePath(), $renameFilepath);
+            if (false === $renameResult) {
                 return 'Renaming of old history file failed';
             }
         }
-        $result = rename($tempFilename, $this->filePath());
-        if (false === $result) {
-            return 'Renaming of newly download history file failed';
-        }
-        return '';
+        $finalResult = rename($tempFilename, $this->filePath());
+        return $finalResult ? '' : 'Renaming of newly download history file failed';
     }
 }

@@ -3,6 +3,8 @@
  * Helper class to generate numbers for the Lotto game.
  */
 
+declare(strict_types=1);
+
 namespace MarkHeydon\LotteryGenerator;
 
 /**
@@ -97,7 +99,11 @@ class LottoGenerate
     private static function getFrequentlyOccurringBalls(array $draws, bool $together): array
     {
         $lottoBalls = Utils::getFrequentlyOccurringBalls(
-            $draws, self::getBallNames(), 6, $together);
+            $draws,
+            self::getBallNames(),
+            6,
+            $together
+        );
 
         // Return results array
         $results = [
@@ -187,10 +193,10 @@ class LottoGenerate
      * @since 1.0.0
      *
      * @param array $draws Array of draws.
-     * @param string $ballSet Ball set to filter by.
+     * @param int $ballSet Ball set to filter by.
      * @return array Filtered array of draws.
      */
-    private static function filterDrawsByBallSet(array $draws, string $ballSet): array
+    private static function filterDrawsByBallSet(array $draws, int $ballSet): array
     {
         $filteredDraws = Utils::filterDrawsBy(['ballSet'], $draws, $ballSet);
         return $filteredDraws;
@@ -212,5 +218,4 @@ class LottoGenerate
         $ballNames[] = 'bonusBall';
         return $ballNames;
     }
-
 }

@@ -3,9 +3,10 @@
  * Unit tests for Utils class.
  */
 
+declare(strict_types=1);
+
 namespace MarkHeydonTests\LotteryGenerator;
 
-use MarkHeydon\LotteryGenerator\LottoDownload;
 use MarkHeydon\LotteryGenerator\Utils;
 use PHPUnit\Framework\TestCase;
 
@@ -13,6 +14,8 @@ use PHPUnit\Framework\TestCase;
  * Unit tests for Utils class.
  *
  * @package MarkHeydonTests\LotteryGenerator
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class UtilsTest extends TestCase
 {
@@ -299,6 +302,8 @@ class UtilsTest extends TestCase
 
     /**
      * Tests returning latest Draw date from draws array.
+     *
+     * @throws \Exception
      */
     public function testLatestDrawsDate()
     {
