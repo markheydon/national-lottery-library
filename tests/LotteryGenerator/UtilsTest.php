@@ -1,25 +1,28 @@
 <?php
+
 /**
  * Unit tests for Utils class.
  */
 
 namespace MarkHeydonTests\LotteryGenerator;
 
-use MarkHeydon\LotteryGenerator\LottoDownload;
 use MarkHeydon\LotteryGenerator\Utils;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Error\Error as ErrorError;
 
 /**
  * Unit tests for Utils class.
  *
  * @package MarkHeydonTests\LotteryGenerator
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class UtilsTest extends TestCase
 {
     /**
      * Tests that csv parser returns error on file not found.
      *
-     * @expectedException PHPUnit\Framework\Error\Error
+     * @expectedException ErrorError
      */
     public function testCsvToArrayNoFile()
     {
@@ -299,6 +302,8 @@ class UtilsTest extends TestCase
 
     /**
      * Tests returning latest Draw date from draws array.
+     *
+     * @throws \Exception
      */
     public function testLatestDrawsDate()
     {

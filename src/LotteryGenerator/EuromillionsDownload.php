@@ -84,5 +84,4 @@ class EuromillionsDownload
         $downloader = new Downloader(self::HISTORY_DOWNLOAD_URL, self::FILENAME);
         return $downloader->filePath();
     }
-
 }

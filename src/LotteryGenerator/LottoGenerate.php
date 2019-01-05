@@ -97,7 +97,11 @@ class LottoGenerate
     private static function getFrequentlyOccurringBalls(array $draws, bool $together): array
     {
         $lottoBalls = Utils::getFrequentlyOccurringBalls(
-            $draws, self::getBallNames(), 6, $together);
+            $draws,
+            self::getBallNames(),
+            6,
+            $together
+        );
 
         // Return results array
         $results = [
@@ -212,5 +216,4 @@ class LottoGenerate
         $ballNames[] = 'bonusBall';
         return $ballNames;
     }
-
 }
