@@ -5,6 +5,7 @@
 
 namespace MarkHeydonTests\LotteryGenerator;
 
+use MarkHeydon\LotteryGenerator\LottoDownload;
 use MarkHeydon\LotteryGenerator\Utils;
 use PHPUnit\Framework\TestCase;
 
@@ -269,5 +270,48 @@ class UtilsTest extends TestCase
         $res = Utils::getFrequentlyOccurringBalls($testDraws, $ballNames, 3, false);
         $this->assertCount(3, $res);
         $this->assertEquals([1, 2, 4], $res, '', 0.0, 10, true);
+    }
+
+    /**
+     * Tests latest draw routine throws error on empty array supplied.
+     *
+     * @expectedException \RuntimeException
+     */
+    public function testLatestDrawsDateEmpty()
+    {
+        Utils::getLatestDrawDate([]);
+    }
+
+    /**
+     * Tests latest draw routine throws error on invalid array supplied.
+     *
+     * @expectedException \RuntimeException
+     */
+    public function testLatestDrawsDateInvalid()
+    {
+        $draws = [
+            [
+                'invalid' => '01-JAN-2019',
+            ]
+        ];
+        Utils::getLatestDrawDate($draws);
+    }
+
+    /**
+     * Tests returning latest Draw date from draws array.
+     */
+    public function testLatestDrawsDate()
+    {
+        $draws = [
+            [
+                'drawDate' => '01-Jan-2018',
+            ],
+            [
+                'drawDate' => '01-Jan-2019',
+            ],
+        ];
+        $latest = Utils::getLatestDrawDate($draws);
+        $expected = new \DateTime('01-Jan-2019');
+        $this->assertSame($expected->getTimestamp(), $latest->getTimestamp());
     }
 }

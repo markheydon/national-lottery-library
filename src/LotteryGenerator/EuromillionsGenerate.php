@@ -22,9 +22,11 @@ class EuromillionsGenerate
      */
     public static function generate(): array
     {
-        // @todo: Download results periodically -- only updated weekly I think?
-        // Currently using a lotto-draw-history.csv file but should download and/or utilize a database.
         $allDraws = EuromillionsDownload::readEuromillionsDrawHistory();
+
+        // Build the results array header
+        $gameName = 'EuroMillions';
+        $latestDrawDate = Utils::getLatestDrawDate($allDraws);
 
         // Build some generated lines of 'random' numbers and return
         $linesMethod1 = self::generateMostFrequentTogether($allDraws);
@@ -36,7 +38,20 @@ class EuromillionsGenerate
             'method2' => $linesMethod2,
             'method3' => $linesMethod3,
         ];
-        return $lines;
+        $lineBalls = [
+            'mainNumbers' => 5,
+            'luckyStars' => 2,
+        ];
+
+        // Build the results array and return
+        $results = [
+            'gameName' => $gameName,
+            'latestDrawDate' => $latestDrawDate,
+            'numOfMethods' => count($lines),
+            'lineBalls' => $lineBalls,
+            'lines' => $lines,
+        ];
+        return $results;
     }
 
     /**
@@ -89,7 +104,7 @@ class EuromillionsGenerate
 
         // Return results array
         $results = [
-            'normal' => $normalBalls,
+            'mainNumbers' => $normalBalls,
             'luckyStars' => $luckyStars,
         ];
         return $results;

@@ -157,4 +157,32 @@ class Utils
         asort($results);
         return $results;
     }
+
+    /**
+     * Returns the latest (more recent) draw date from a draws array.
+     *
+     * @param array $draws The draws array to use.
+     *
+     * @return \DateTime Latest draw date from the supplied draws array.
+     * @throws \RuntimeException Supplied draws array cannot be empty.
+     */
+    public static function getLatestDrawDate(array $draws): \DateTime
+    {
+        if (count($draws) < 1) {
+            throw new \RuntimeException('Supplied draws empty cannot be empty');
+        }
+
+        // make array of just the drawDate values as DateTime objects
+        $drawDates = array_map(function ($draw) {
+            if (!key_exists('drawDate', $draw)) {
+                throw new \RuntimeException('Invalid draws array');
+            }
+            return new \DateTime($draw['drawDate']);
+        }, $draws);
+
+        // sort and return the top one
+        rsort($drawDates);
+        $first = $drawDates[0];
+        return $first;
+    }
 }

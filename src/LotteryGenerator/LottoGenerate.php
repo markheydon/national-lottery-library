@@ -22,9 +22,11 @@ class LottoGenerate
      */
     public static function generate(): array
     {
-        // @todo: Download results periodically -- only updated weekly I think?
-        // Currently using a lotto-draw-history.csv file but should download and/or utilize a database.
         $allDraws = LottoDownload::readLottoDrawHistory();
+
+        // Build the results array header
+        $gameName = 'Lotto';
+        $latestDrawDate = Utils::getLatestDrawDate($allDraws);
 
         // Build some generated lines of 'random' numbers and return
         $linesMethod1 = self::generateMostFrequentTogether($allDraws);
@@ -36,7 +38,19 @@ class LottoGenerate
             'method2' => $linesMethod2,
             'method3' => $linesMethod3,
         ];
-        return $lines;
+        $lineBalls = [
+            'lottoBalls' => 6,
+        ];
+
+        // Build the results array and return
+        $results = [
+            'gameName' => $gameName,
+            'latestDrawDate' => $latestDrawDate,
+            'numOfMethods' => count($lines),
+            'lineBalls' => $lineBalls,
+            'lines' => $lines,
+        ];
+        return $results;
     }
 
     /**
@@ -78,12 +92,17 @@ class LottoGenerate
      *
      * @param array $draws The draws array to use.
      * @param bool $together Balls that occur together?
-     * @return array Array of balls.
+     * @return array Array of balls 'normal' => (5), 'luckyStars' => (2).
      */
     private static function getFrequentlyOccurringBalls(array $draws, bool $together): array
     {
-        $results = Utils::getFrequentlyOccurringBalls(
+        $lottoBalls = Utils::getFrequentlyOccurringBalls(
             $draws, self::getBallNames(), 6, $together);
+
+        // Return results array
+        $results = [
+            'lottoBalls' => $lottoBalls,
+        ];
         return $results;
     }
 
