@@ -8,7 +8,6 @@ namespace MarkHeydonTests\LotteryGenerator;
 
 use MarkHeydon\LotteryGenerator\Utils;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\Error\Error as ErrorError;
 
 /**
  * Unit tests for Utils class.
@@ -22,7 +21,7 @@ class UtilsTest extends TestCase
     /**
      * Tests that csv parser returns error on file not found.
      *
-     * @expectedException ErrorError
+     * @expectedException PHPUnit\Framework\Error\Error
      */
     public function testCsvToArrayNoFile()
     {
