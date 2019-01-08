@@ -9,8 +9,14 @@ trigger:
 pool:
   vmImage: 'Ubuntu-16.04'
 
-variables:
-  phpVersion: 7.2
+strategy:
+  matrix:
+    PhpVersion71:
+      phpVersion: 7.1
+    PhpVersion72:
+      phpVersion: 7.2
+    PhpVersion73:
+      phpVersion: 7.3
 
 steps:
 - script: |
