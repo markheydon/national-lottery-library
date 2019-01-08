@@ -20,6 +20,14 @@ strategy:
 
 steps:
 - script: |
+    sudo add-apt-repository ppa:ondrej/php
+    sudo apt-get update
+    sudo apt-get install php7.3
+    php -version
+  displayName 'Install PHP $(phpVersion)'
+  condition: eq(variables['phpVersion'], '7.3')
+  
+- script: |
     sudo update-alternatives --set php /usr/bin/php$(phpVersion)
     sudo update-alternatives --set phar /usr/bin/phar$(phpVersion)
     sudo update-alternatives --set phpdbg /usr/bin/phpdbg$(phpVersion)
