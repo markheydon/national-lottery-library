@@ -24,7 +24,7 @@ steps:
     sudo apt-get update
     sudo apt-get install php7.3
     php -version
-  displayName 'Install PHP $(phpVersion)'
+  displayName: 'Install PHP $(phpVersion)'
   condition: eq(variables['phpVersion'], '7.3')
   
 - script: |
