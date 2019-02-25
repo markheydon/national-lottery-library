@@ -16,6 +16,25 @@ namespace MarkHeydon\LotteryGenerator;
 class EuromillionsGenerate
 {
     /**
+     * The name of the EuroMillions game.
+     *
+     * @return string Name of the EuroMillions game.
+     */
+    protected static function getNameOfGame(): string
+    {
+        return 'EuroMillions';
+    }
+
+    /**
+     * Should results include Lucky Stars?
+     *
+     * @return bool True if results should include Lucky Stars.
+     */
+    private static function hasLuckyStars(): bool
+    {
+        return (static::getNameOfGame() === self::getNameOfGame());
+    }
+    /**
      * Generate 'random' Lotto numbers.
      *
      * @since 1.0.0
@@ -27,7 +46,7 @@ class EuromillionsGenerate
         $allDraws = EuromillionsDownload::readEuromillionsDrawHistory();
 
         // Build the results array header
-        $gameName = 'EuroMillions';
+        $gameName = static::getNameOfGame();
         $latestDrawDate = Utils::getLatestDrawDate($allDraws);
 
         // Build some generated lines of 'random' numbers and return
@@ -36,14 +55,16 @@ class EuromillionsGenerate
         $linesMethod3 = self::generateFullIteration($allDraws);
 
         $lines = [
-            'method1' => $linesMethod1,
-            'method2' => $linesMethod2,
-            'method3' => $linesMethod3,
+            'full-iteration' => $linesMethod3,
+            'most-freq-together' => $linesMethod1,
+            'most-freq' => $linesMethod2,
         ];
         $lineBalls = [
             'mainNumbers' => 5,
-            'luckyStars' => 2,
         ];
+        if (static::hasLuckyStars()) {
+            $lineBalls['luckyStars'] = 2;
+        }
 
         // Build the results array and return
         $results = [
@@ -99,24 +120,25 @@ class EuromillionsGenerate
      */
     private static function getFrequentlyOccurringBalls(array $draws, bool $together): array
     {
+        $results = [];
         $normalBalls = Utils::getFrequentlyOccurringBalls(
             $draws,
             self::getNormalBallNames(),
             5,
             $together
         );
-        $luckyStars = Utils::getFrequentlyOccurringBalls(
-            $draws,
-            self::getLuckyStarNames(),
-            2,
-            $together
-        );
+        $results['mainNumbers'] = $normalBalls;
+        if (static::hasLuckyStars()) {
+            $luckyStars = Utils::getFrequentlyOccurringBalls(
+                $draws,
+                self::getLuckyStarNames(),
+                2,
+                $together
+            );
+            $results['luckyStars'] = $luckyStars;
+        }
 
         // Return results array
-        $results = [
-            'mainNumbers' => $normalBalls,
-            'luckyStars' => $luckyStars,
-        ];
         return $results;
     }
 

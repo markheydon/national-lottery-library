@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper class to generate numbers for the Lotto game.
+ * Helper class to generate numbers for the Thunderball game.
  */
 
 declare(strict_types=1);
@@ -8,12 +8,12 @@ declare(strict_types=1);
 namespace MarkHeydon\LotteryGenerator;
 
 /**
- * Helper class to generate numbers for the Lotto game.
+ * Helper class to generate numbers for the Thunderball game.
  *
  * @package MarkHeydon\LotteryGenerator
  * @since 1.0.0
  */
-class LottoGenerate
+class ThunderballGenerate
 {
     /**
      * The name of the Lotto game.
@@ -22,7 +22,17 @@ class LottoGenerate
      */
     protected static function getNameOfGame(): string
     {
-        return 'Lotto';
+        return 'Thunderball';
+    }
+
+    /**
+     * Should results include Lucky Stars?
+     *
+     * @return bool True if results should include Lucky Stars.
+     */
+    private static function hasThunderball(): bool
+    {
+        return (static::getNameOfGame() === self::getNameOfGame());
     }
 
     /**
@@ -30,9 +40,9 @@ class LottoGenerate
      *
      * @return int Num of Lotto balls in results.
      */
-    protected static function getNumOfBalls(): int
+    protected static function getNumOfMainBalls(): int
     {
-        return 6;
+        return 5;
     }
 
     /**
@@ -44,7 +54,7 @@ class LottoGenerate
      */
     public static function generate(): array
     {
-        $allDraws = LottoDownload::readLottoDrawHistory();
+        $allDraws = ThunderballDownload::readThunderballDrawHistory();
 
         // Build the results array header
         $gameName = static::getNameOfGame();
@@ -61,8 +71,12 @@ class LottoGenerate
             'most-freq' => $linesMethod2,
         ];
         $lineBalls = [
-            'lottoBalls' => static::getNumOfBalls(),
+            'mainNumbers' => static::getNumOfMainBalls(),
         ];
+        if (static::hasThunderball()) {
+            $lineBalls['thunderball'] = 1;
+        }
+
 
         // Build the results array and return
         $results = [
@@ -76,7 +90,7 @@ class LottoGenerate
     }
 
     /**
-     * Generate a lotto line by finding balls that occurs most frequently across all data together.
+     * Generate a line by finding balls that occurs most frequently across all data together.
      *
      * I.e. looks for numbers that occur within the same lines together, not across the whole data set.
      *
@@ -89,7 +103,7 @@ class LottoGenerate
     {
         // return as array to keep consistence with other generate method(s)
         $lines = [];
-        $lines[] = self::getFrequentlyOccurringBalls($draws, static::getNumOfBalls(), true);
+        $lines[] = self::getFrequentlyOccurringBalls($draws, true);
         return $lines;
     }
 
@@ -105,7 +119,7 @@ class LottoGenerate
     {
         // return as array to keep consistence with other generate method(s)
         $lines = [];
-        $lines[] = self::getFrequentlyOccurringBalls($draws, static::getNumOfBalls(), false);
+        $lines[] = self::getFrequentlyOccurringBalls($draws, false);
         return $lines;
     }
 
@@ -113,24 +127,46 @@ class LottoGenerate
      * Returns array of balls that frequently occur for the specified draws array.
      *
      * @param array $draws The draws array to use.
-     * @param int $numOfResults The number of results to return in the balls array.
      * @param bool $together Balls that occur together?
      * @return array Array of balls 'normal' => (5), 'luckyStars' => (2).
      */
-    protected static function getFrequentlyOccurringBalls(array $draws, int $numOfResults, bool $together): array
+    private static function getFrequentlyOccurringBalls(array $draws, bool $together): array
     {
-        $lottoBalls = Utils::getFrequentlyOccurringBalls(
+        $results = [];
+        $normalBalls = Utils::getFrequentlyOccurringBalls(
             $draws,
-            static::getBallNames(),
-            $numOfResults,
+            self::getNormalBallNames(),
+            static::getNumOfMainBalls(),
             $together
         );
+        $results['mainNumbers'] = $normalBalls;
+        if (static::hasThunderball()) {
+            $thunderball = Utils::getFrequentlyOccurringBalls(
+                $draws,
+                ['thunderball'],
+                1,
+                $together
+            );
+            $results['thunderball'] = $thunderball;
+        }
 
         // Return results array
-        $results = [
-            'lottoBalls' => $lottoBalls,
-        ];
         return $results;
+    }
+
+    /**
+     * Array of normal ball names.
+     *
+     * @return array Array of normal ball names.
+     */
+    private static function getNormalBallNames(): array
+    {
+        $ballNames = [];
+        for ($b = 1; $b <= static::getNumOfMainBalls(); $b++) {
+            $ballNumber = 'ball' . $b;
+            $ballNames[] = $ballNumber;
+        }
+        return $ballNames;
     }
 
     /**
@@ -154,7 +190,7 @@ class LottoGenerate
             $ballSets = self::getBallSets($machineDraws);
             foreach ($ballSets as $ballSet) {
                 $filteredDraws = self::filterDrawsByBallSet($machineDraws, $ballSet);
-                $lines[] = self::getFrequentlyOccurringBalls($filteredDraws, static::getNumOfBalls(), true);
+                $lines[] = self::getFrequentlyOccurringBalls($filteredDraws, true);
             }
         }
 
@@ -214,30 +250,12 @@ class LottoGenerate
      * @since 1.0.0
      *
      * @param array $draws Array of draws.
-     * @param int $ballSet Ball set to filter by.
+     * @param string $ballSet Ball set to filter by.
      * @return array Filtered array of draws.
      */
-    private static function filterDrawsByBallSet(array $draws, int $ballSet): array
+    private static function filterDrawsByBallSet(array $draws, string $ballSet): array
     {
         $filteredDraws = Utils::filterDrawsBy(['ballSet'], $draws, $ballSet);
         return $filteredDraws;
-    }
-
-    /**
-     * Array of ball names.
-     *
-     * Balls 1 ~ 6 plus the bonus ball.
-     *
-     * @return array Array of ball names.
-     */
-    protected static function getBallNames(): array
-    {
-        $ballNames = [];
-        for ($b = 1; $b <= static::getNumOfBalls(); $b++) {
-            $ballNumber = 'ball' . $b;
-            $ballNames[] = $ballNumber;
-        }
-        $ballNames[] = 'bonusBall';
-        return $ballNames;
     }
 }
