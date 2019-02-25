@@ -16,6 +16,26 @@ namespace MarkHeydon\LotteryGenerator;
 class LottoGenerate
 {
     /**
+     * The name of the Lotto game.
+     *
+     * @return string Name of the Lotto game.
+     */
+    protected static function getNameOfGame(): string
+    {
+        return 'Lotto';
+    }
+
+    /**
+     * The number of Lotto balls to return in the results.
+     *
+     * @return int Num of Lotto balls in results.
+     */
+    protected static function getNumOfBalls(): int
+    {
+        return 6;
+    }
+
+    /**
      * Generate 'random' Lotto numbers.
      *
      * @since 1.0.0
@@ -27,7 +47,7 @@ class LottoGenerate
         $allDraws = LottoDownload::readLottoDrawHistory();
 
         // Build the results array header
-        $gameName = 'Lotto';
+        $gameName = static::getNameOfGame();
         $latestDrawDate = Utils::getLatestDrawDate($allDraws);
 
         // Build some generated lines of 'random' numbers and return
@@ -36,12 +56,12 @@ class LottoGenerate
         $linesMethod3 = self::generateFullIteration($allDraws);
 
         $lines = [
-            'method1' => $linesMethod1,
-            'method2' => $linesMethod2,
-            'method3' => $linesMethod3,
+            'full-iteration' => $linesMethod3,
+            'most-freq-together' => $linesMethod1,
+            'most-freq' => $linesMethod2,
         ];
         $lineBalls = [
-            'lottoBalls' => 6,
+            'lottoBalls' => static::getNumOfBalls(),
         ];
 
         // Build the results array and return
@@ -65,11 +85,11 @@ class LottoGenerate
      * @param array $draws The draws array to use.
      * @return array Array of lines generated.
      */
-    private static function generateMostFrequentTogether(array $draws): array
+    protected static function generateMostFrequentTogether(array $draws): array
     {
         // return as array to keep consistence with other generate method(s)
         $lines = [];
-        $lines[] = self::getFrequentlyOccurringBalls($draws, true);
+        $lines[] = self::getFrequentlyOccurringBalls($draws, static::getNumOfBalls(), true);
         return $lines;
     }
 
@@ -81,11 +101,11 @@ class LottoGenerate
      * @param array $draws The draws array to use.
      * @return array Array of lines generated.
      */
-    private static function generateMostFrequent(array $draws): array
+    protected static function generateMostFrequent(array $draws): array
     {
         // return as array to keep consistence with other generate method(s)
         $lines = [];
-        $lines[] = self::getFrequentlyOccurringBalls($draws, false);
+        $lines[] = self::getFrequentlyOccurringBalls($draws, static::getNumOfBalls(), false);
         return $lines;
     }
 
@@ -93,15 +113,16 @@ class LottoGenerate
      * Returns array of balls that frequently occur for the specified draws array.
      *
      * @param array $draws The draws array to use.
+     * @param int $numOfResults The number of results to return in the balls array.
      * @param bool $together Balls that occur together?
      * @return array Array of balls 'normal' => (5), 'luckyStars' => (2).
      */
-    private static function getFrequentlyOccurringBalls(array $draws, bool $together): array
+    protected static function getFrequentlyOccurringBalls(array $draws, int $numOfResults, bool $together): array
     {
         $lottoBalls = Utils::getFrequentlyOccurringBalls(
             $draws,
-            self::getBallNames(),
-            6,
+            static::getBallNames(),
+            $numOfResults,
             $together
         );
 
@@ -123,7 +144,7 @@ class LottoGenerate
      * @param array $draws The draws array to use.
      * @return array Array of lines generated.
      */
-    private static function generateFullIteration(array $draws): array
+    protected static function generateFullIteration(array $draws): array
     {
         $lines = [];
         $machines = self::getMachineNames($draws);
@@ -133,7 +154,7 @@ class LottoGenerate
             $ballSets = self::getBallSets($machineDraws);
             foreach ($ballSets as $ballSet) {
                 $filteredDraws = self::filterDrawsByBallSet($machineDraws, $ballSet);
-                $lines[] = self::getFrequentlyOccurringBalls($filteredDraws, true);
+                $lines[] = self::getFrequentlyOccurringBalls($filteredDraws, static::getNumOfBalls(), true);
             }
         }
 
@@ -209,9 +230,10 @@ class LottoGenerate
      *
      * @return array Array of ball names.
      */
-    private static function getBallNames(): array
+    protected static function getBallNames(): array
     {
-        for ($b = 1; $b <= 6; $b++) {
+        $ballNames = [];
+        for ($b = 1; $b <= static::getNumOfBalls(); $b++) {
             $ballNumber = 'ball' . $b;
             $ballNames[] = $ballNumber;
         }
