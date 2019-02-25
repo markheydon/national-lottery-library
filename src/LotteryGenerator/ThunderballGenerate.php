@@ -66,9 +66,9 @@ class ThunderballGenerate
         $linesMethod3 = self::generateFullIteration($allDraws);
 
         $lines = [
-            'full-iteration' => $linesMethod3,
-            'most-freq-together' => $linesMethod1,
             'most-freq' => $linesMethod2,
+            'most-freq-together' => $linesMethod1,
+            'full-iteration' => $linesMethod3,
         ];
         $lineBalls = [
             'mainNumbers' => static::getNumOfMainBalls(),

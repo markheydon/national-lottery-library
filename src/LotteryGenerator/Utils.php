@@ -134,6 +134,7 @@ class Utils
      * @param array $ballNames The draw array index names for the balls.
      * @param int $numOfResults The number of results to return in the balls array.
      * @param bool $together Balls that occur together?
+     * @param bool $sorted Returns the results sorted or not.
      *
      * @return array Array of balls.
      */
@@ -141,7 +142,8 @@ class Utils
         array $draws,
         array $ballNames,
         int $numOfResults,
-        bool $together
+        bool $together,
+        bool $sorted = true
     ): array {
         $results = [];
         $myDraws = $draws;
@@ -156,7 +158,9 @@ class Utils
         }
 
         // Sort the results and return
-        asort($results);
+        if ($sorted) {
+            asort($results);
+        }
         return $results;
     }
 

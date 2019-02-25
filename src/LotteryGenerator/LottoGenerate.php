@@ -36,6 +36,17 @@ class LottoGenerate
     }
 
     /**
+     * Is this the main Lotto game?
+     *
+     * @return bool True if main Lotto game.
+     */
+    private static function isLottoGame(): bool
+    {
+        // The current logic is that the base class is Lotto.
+        return (static::getNameOfGame() === self::getNameOfGame());
+    }
+
+    /**
      * Generate 'random' Lotto numbers.
      *
      * @since 1.0.0
@@ -55,11 +66,19 @@ class LottoGenerate
         $linesMethod2 = self::generateMostFrequent($allDraws);
         $linesMethod3 = self::generateFullIteration($allDraws);
 
-        $lines = [
-            'full-iteration' => $linesMethod3,
-            'most-freq-together' => $linesMethod1,
-            'most-freq' => $linesMethod2,
-        ];
+        // Order of methods differs for Hotpicks.
+        $lines = [];
+        if (static::isLottoGame()) {
+            $lines['most-freq'] = $linesMethod2;
+            $lines['most-freq-together'] = $linesMethod1;
+            $lines['full-iteration'] = $linesMethod3;
+        } else {
+            $lines['most-freq-together'] = $linesMethod1;
+            $lines['full-iteration'] = $linesMethod3;
+            $lines['most-freq'] = $linesMethod2;
+        }
+
+        // Meta data for results structure.
         $lineBalls = [
             'lottoBalls' => static::getNumOfBalls(),
         ];
@@ -123,7 +142,8 @@ class LottoGenerate
             $draws,
             static::getBallNames(),
             $numOfResults,
-            $together
+            $together,
+            static::isLottoGame()
         );
 
         // Return results array

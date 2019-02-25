@@ -30,10 +30,12 @@ class EuromillionsGenerate
      *
      * @return bool True if results should include Lucky Stars.
      */
-    private static function hasLuckyStars(): bool
+    private static function isEuroMillionsGame(): bool
     {
+        // The current logic is that the base class is EuroMillions.
         return (static::getNameOfGame() === self::getNameOfGame());
     }
+
     /**
      * Generate 'random' Lotto numbers.
      *
@@ -54,15 +56,23 @@ class EuromillionsGenerate
         $linesMethod2 = self::generateMostFrequent($allDraws);
         $linesMethod3 = self::generateFullIteration($allDraws);
 
-        $lines = [
-            'full-iteration' => $linesMethod3,
-            'most-freq-together' => $linesMethod1,
-            'most-freq' => $linesMethod2,
-        ];
+        // Order of methods differs for Hotpicks.
+        $lines = [];
+        if (static::isEuroMillionsGame()) {
+            $lines['most-freq'] = $linesMethod2;
+            $lines['most-freq-together'] = $linesMethod1;
+            $lines['full-iteration'] = $linesMethod3;
+        } else {
+            $lines['most-freq-together'] = $linesMethod1;
+            $lines['full-iteration'] = $linesMethod3;
+            $lines['most-freq'] = $linesMethod2;
+        }
+
+        // Meta data for results structure.
         $lineBalls = [
             'mainNumbers' => 5,
         ];
-        if (static::hasLuckyStars()) {
+        if (static::isEuroMillionsGame()) {
             $lineBalls['luckyStars'] = 2;
         }
 
@@ -125,10 +135,11 @@ class EuromillionsGenerate
             $draws,
             self::getNormalBallNames(),
             5,
-            $together
+            $together,
+            static::isEuroMillionsGame()
         );
         $results['mainNumbers'] = $normalBalls;
-        if (static::hasLuckyStars()) {
+        if (static::isEuroMillionsGame()) {
             $luckyStars = Utils::getFrequentlyOccurringBalls(
                 $draws,
                 self::getLuckyStarNames(),
