@@ -16,6 +16,27 @@ namespace MarkHeydon\LotteryGenerator;
 class EuromillionsGenerate
 {
     /**
+     * The name of the EuroMillions game.
+     *
+     * @return string Name of the EuroMillions game.
+     */
+    protected static function getNameOfGame(): string
+    {
+        return 'EuroMillions';
+    }
+
+    /**
+     * Should results include Lucky Stars?
+     *
+     * @return bool True if results should include Lucky Stars.
+     */
+    private static function isEuroMillionsGame(): bool
+    {
+        // The current logic is that the base class is EuroMillions.
+        return (static::getNameOfGame() === self::getNameOfGame());
+    }
+
+    /**
      * Generate 'random' Lotto numbers.
      *
      * @since 1.0.0
@@ -27,7 +48,7 @@ class EuromillionsGenerate
         $allDraws = EuromillionsDownload::readEuromillionsDrawHistory();
 
         // Build the results array header
-        $gameName = 'EuroMillions';
+        $gameName = static::getNameOfGame();
         $latestDrawDate = Utils::getLatestDrawDate($allDraws);
 
         // Build some generated lines of 'random' numbers and return
@@ -35,15 +56,25 @@ class EuromillionsGenerate
         $linesMethod2 = self::generateMostFrequent($allDraws);
         $linesMethod3 = self::generateFullIteration($allDraws);
 
-        $lines = [
-            'method1' => $linesMethod1,
-            'method2' => $linesMethod2,
-            'method3' => $linesMethod3,
-        ];
+        // Order of methods differs for Hotpicks.
+        $lines = [];
+        if (static::isEuroMillionsGame()) {
+            $lines['most-freq'] = $linesMethod2;
+            $lines['most-freq-together'] = $linesMethod1;
+            $lines['full-iteration'] = $linesMethod3;
+        } else {
+            $lines['most-freq-together'] = $linesMethod1;
+            $lines['full-iteration'] = $linesMethod3;
+            $lines['most-freq'] = $linesMethod2;
+        }
+
+        // Meta data for results structure.
         $lineBalls = [
             'mainNumbers' => 5,
-            'luckyStars' => 2,
         ];
+        if (static::isEuroMillionsGame()) {
+            $lineBalls['luckyStars'] = 2;
+        }
 
         // Build the results array and return
         $results = [
@@ -99,24 +130,26 @@ class EuromillionsGenerate
      */
     private static function getFrequentlyOccurringBalls(array $draws, bool $together): array
     {
+        $results = [];
         $normalBalls = Utils::getFrequentlyOccurringBalls(
             $draws,
             self::getNormalBallNames(),
             5,
-            $together
+            $together,
+            static::isEuroMillionsGame()
         );
-        $luckyStars = Utils::getFrequentlyOccurringBalls(
-            $draws,
-            self::getLuckyStarNames(),
-            2,
-            $together
-        );
+        $results['mainNumbers'] = $normalBalls;
+        if (static::isEuroMillionsGame()) {
+            $luckyStars = Utils::getFrequentlyOccurringBalls(
+                $draws,
+                self::getLuckyStarNames(),
+                2,
+                $together
+            );
+            $results['luckyStars'] = $luckyStars;
+        }
 
         // Return results array
-        $results = [
-            'mainNumbers' => $normalBalls,
-            'luckyStars' => $luckyStars,
-        ];
         return $results;
     }
 
