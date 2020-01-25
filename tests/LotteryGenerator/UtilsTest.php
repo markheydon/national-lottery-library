@@ -21,11 +21,10 @@ class UtilsTest extends TestCase
 {
     /**
      * Tests that csv parser returns error on file not found.
-     *
-     * @expectedException PHPUnit\Framework\Error\Error
      */
     public function testCsvToArrayNoFile()
     {
+        $this->expectExceptionObject(PHPUnit\Framework\Error\Error);
         Utils::csvToArray('FILE_NOT_FOUND');
     }
 
