@@ -22,6 +22,7 @@ RUN apt-get update \
     #
     # install git iproute2, procps, lsb-release (useful for CLI installs)
     && apt-get -y install git iproute2 procps iproute2 lsb-release \
+    && apt-get -y install zip \
     #
     # Install xdebug
     && yes | pecl install xdebug \
@@ -45,4 +46,5 @@ RUN apt-get update \
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=
  
-
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
