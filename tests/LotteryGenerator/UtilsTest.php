@@ -24,7 +24,7 @@ class UtilsTest extends TestCase
      */
     public function testCsvToArrayNoFile()
     {
-        $this->expectExceptionObject(PHPUnit\Framework\Error\Error);
+        $this->expectError();
         Utils::csvToArray('FILE_NOT_FOUND');
     }
 
@@ -217,7 +217,7 @@ class UtilsTest extends TestCase
 
         $res = Utils::filterDrawsBy(['whatever'], $testDraws, 2);
         $this->assertCount(1, $res);
-        $this->assertEquals([['whatever' => 2]], $res, '', 0.0, 10, true);
+        $this->assertEqualsCanonicalizing([['whatever' => 2]], $res);
     }
 
     /**
@@ -246,7 +246,7 @@ class UtilsTest extends TestCase
 
         $res = Utils::filterDrawsBy($ballNames, $testDraws, 3);
         $this->assertCount(1, $res);
-        $this->assertEquals([['ball1' => 2, 'ball2' => 1, 'ball3' => 3]], $res, '', 0.0, 10, true);
+        $this->assertEqualsCanonicalizing([['ball1' => 2, 'ball2' => 1, 'ball3' => 3]], $res);
     }
 
     /**
@@ -271,23 +271,20 @@ class UtilsTest extends TestCase
         // should return 2, 1 and 4
         $res = Utils::getFrequentlyOccurringBalls($testDraws, $ballNames, 3, false);
         $this->assertCount(3, $res);
-        $this->assertEquals([1, 2, 4], $res, '', 0.0, 10, true);
+        $this->assertEqualsCanonicalizing([1, 2, 4], $res);
     }
 
     /**
      * Tests latest draw routine throws error on empty array supplied.
-     *
-     * @expectedException \RuntimeException
      */
     public function testLatestDrawsDateEmpty()
     {
+        $this->expectException(\RuntimeException::class);
         Utils::getLatestDrawDate([]);
     }
 
     /**
      * Tests latest draw routine throws error on invalid array supplied.
-     *
-     * @expectedException \RuntimeException
      */
     public function testLatestDrawsDateInvalid()
     {
@@ -296,6 +293,7 @@ class UtilsTest extends TestCase
                 'invalid' => '01-JAN-2019',
             ]
         ];
+        $this->expectException(\RuntimeException::class);
         Utils::getLatestDrawDate($draws);
     }
 
