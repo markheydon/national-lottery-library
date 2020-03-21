@@ -57,7 +57,7 @@ class LottoDownload
             $bonusBall = $draw['Bonus Ball'];
             $ballSet = $draw['Ball Set'];
             $machine = $draw['Machine'];
-            $raffles = self::parseRafflesString($draw['Raffles']);
+            $raffles = isset($draw['Raffles']) ? self::parseRafflesString($draw['Raffles']) : '';
             $drawNumber = $draw['DrawNumber'];
             $dayOfDraw = date('l', strtotime($drawDate));
 

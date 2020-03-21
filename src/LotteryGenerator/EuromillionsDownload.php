@@ -55,7 +55,7 @@ class EuromillionsDownload
             $ball5 = $draw['Ball 5'];
             $luckyStar1 = $draw['Lucky Star 1'];
             $luckyStar2 = $draw['Lucky Star 2'];
-            $raffles = explode(',', $draw['UK Millionaire Maker']);
+            $raffles = isset($draw['UK Millionaire Maker']) ? explode(',', $draw['UK Millionaire Maker']) : [];
             $drawNumber = $draw['DrawNumber'];
             $dayOfDraw = date('l', strtotime($drawDate));
 

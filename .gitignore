@@ -4,6 +4,7 @@ vendor/
 
 # Local configs
 config/autoload/*.local.php
+.phpunit.result.cache
 
 # Binary gettext files
 *.mo

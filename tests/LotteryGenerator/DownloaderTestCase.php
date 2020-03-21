@@ -37,7 +37,7 @@ abstract class DownloaderTestCase extends TestCase
     public function testDownloadFailed()
     {
         $result = $this->download(true, false);
-        $this->assertContains('failed', $result);
+        $this->assertStringContainsString('failed', $result);
     }
 
     /**
@@ -46,6 +46,6 @@ abstract class DownloaderTestCase extends TestCase
     public function testDownloadRenameFailed()
     {
         $result = $this->download(false, true);
-        $this->assertContains('failed', $result);
+        $this->assertStringContainsString('failed', $result);
     }
 }
