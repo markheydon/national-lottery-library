@@ -18,7 +18,7 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '7.4'
-        tools: php-cs-fixer, phpunit, cs2pr, phpstan
+        tools: phpcs, phpunit, cs2pr, phpstan
         coverage: xdebug
       env:
         COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -48,6 +48,9 @@ jobs:
     - name: Run test suite
       run: vendor/bin/phpunit --coverage-text
 
+    - name: phpcs
+      run: vendor/bin/phpcs src
+      
     - name: PHPStan
       run: phpstan analyse src --error-format=checkstyle | cs2pr
   
