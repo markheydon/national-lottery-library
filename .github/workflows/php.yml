@@ -1,3 +1,5 @@
+name: PHP Build and Test
+
 on:
   push:
     branches: [ master ]
@@ -9,9 +11,9 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        php-version: ['7.1', '7.2', '7.3', '7.4']
+        php-version: ['7.2', '7.3', '7.4']
 
-    name: PHP ${{ matrix.php-versions }} build and test on ${{ matrix.operating-system }}
+    name: PHP ${{ matrix.php-version }} on ${{ matrix.os }}
 
     runs-on:  ${{ matrix.os }}
 
