@@ -9,9 +9,10 @@ on:
 jobs:
   build-test:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        php-version: ['7.2', '7.3', '7.4']
+        php-version: ['7.3', '7.4']
 
     name: PHP ${{ matrix.php-version }} on ${{ matrix.os }}
 
