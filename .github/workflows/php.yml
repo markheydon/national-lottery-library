@@ -18,11 +18,14 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '7.4'
-        tools: php-cs-fixer, phpunit
-        coverage: pcov
+        tools: php-cs-fixer, phpunit, cs2pr, phpstan
+        coverage: xdebug
       env:
         COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Setup problem matchers for PHP
+      run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+  
     - name: Setup problem matchers for PHPUnit
       run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
@@ -44,3 +47,7 @@ jobs:
 
     - name: Run test suite
       run: vendor/bin/phpunit --coverage-text
+
+    - name: PHPStan
+      run: phpstan analyse src --error-format=checkstyle | cs2pr
+  
