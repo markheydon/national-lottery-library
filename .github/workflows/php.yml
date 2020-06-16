@@ -1,4 +1,4 @@
-name: PHP Composer
+name: PHP
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build-test:
 
     runs-on: ubuntu-latest
 
@@ -18,8 +18,8 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '7.4'
-        tools: phpunit
-        coverage: xdebug
+        tools: php-cs-fixer, phpunit
+        coverage: pcov
       env:
         COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
