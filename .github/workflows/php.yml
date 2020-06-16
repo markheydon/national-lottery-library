@@ -48,9 +48,6 @@ jobs:
     - name: Run test suite
       run: vendor/bin/phpunit --coverage-text
 
-    - name: phpcs
-      run: vendor/bin/phpcs src
-      
     - name: PHPStan
       run: phpstan analyse src --error-format=checkstyle | cs2pr
   
