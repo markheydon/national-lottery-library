@@ -38,6 +38,7 @@ class UtilsTest extends TestCase
         $line1 = "val1,val2" . PHP_EOL;
         $line2 = "val1,val2" . PHP_EOL;
 
+        // TODO: #13 Fix tempnam() call on Windows platforms.
         $tempFile = tempnam('/tmp', 'test-csv-');
         $temp = fopen($tempFile, 'w');
         fwrite($temp, $header);
