@@ -1,3 +1,5 @@
+---  # document start
+
 name: PHP Build and Test
 
 on:
