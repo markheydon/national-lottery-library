@@ -1,5 +1,5 @@
 # national-lottery-library
 
-![PHP Build and Test](https://github.com/markheydon/national-lottery-library/workflows/PHP%20Build%20and%20Test/badge.svg)
+**NO LONGER USED** Was originally used as part of https://github.com/markheydon/national-lottery-generator but code now merged into the app directly and this library abandoned.
 
 PHP library that makes an attempt at 'guessing' the Lotto numbers using a half-arsed bit of logic.
